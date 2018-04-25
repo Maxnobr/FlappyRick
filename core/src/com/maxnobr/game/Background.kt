@@ -17,11 +17,7 @@ class Background : GameObject  {
     private var speed2 = -4f
     private var speed1 = -7f
 
-    //private var scaleX = 0f
-    //private var scaleY = 0f
-
-    override fun create(camera: Camera) {
-        Gdx.app.log("tag","creating background!")
+    override fun create(batch: SpriteBatch,camera: Camera) {
         atlas = TextureAtlas(Gdx.files.internal("Background.atlas"))
         bg3 = Sprite(atlas?.findRegion("bglevel3"))
         bg2 = Sprite(atlas?.findRegion("bglevel2"))
@@ -40,20 +36,19 @@ class Background : GameObject  {
     }
 
     override fun preRender(camera:Camera) {
-        //Gdx.app.log("tag","preRendering background!")
-        bg3.translateX(Gdx.graphics.deltaTime*speed3)
-        bg2.translateX(Gdx.graphics.deltaTime*speed2)
-        bg1.translateX(Gdx.graphics.deltaTime*speed1)
+        if(CthulhuGame.gameState == CthulhuGame.RUN)
+        {
+            bg3.translateX(Gdx.graphics.deltaTime * speed3)
+            bg2.translateX(Gdx.graphics.deltaTime * speed2)
+            bg1.translateX(Gdx.graphics.deltaTime * speed1)
 
-        if(bg3.x < -camera.viewportWidth)bg3.x = 0f
-        if(bg2.x < -camera.viewportWidth)bg2.x = 0f
-        if(bg1.x < -camera.viewportWidth)bg1.x = 0f
+            if (bg3.x < -camera.viewportWidth) bg3.x = 0f
+            if (bg2.x < -camera.viewportWidth) bg2.x = 0f
+            if (bg1.x < -camera.viewportWidth) bg1.x = 0f
+        }
     }
 
     override fun render(batch: SpriteBatch,camera: Camera) {
-        Gdx.app.log("tag","rendering background!")
-
-
         bg3.draw(batch)
         if(bg3.x < 0) {
             bg3.translateX(camera.viewportWidth)

@@ -1,11 +1,8 @@
 package com.maxnobr.game
 
-import com.badlogic.gdx.graphics.g2d.Animation
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.g2d.*
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
@@ -20,6 +17,7 @@ class Saucer : GameObject {
 
     // Frame that must be rendered at each time
     private lateinit var currentFrame: TextureRegion
+    private lateinit var sprite: Sprite
 
     // Running animation
     private var flyingAnimation: Animation<TextureAtlas.AtlasRegion>? = null
@@ -49,28 +47,34 @@ class Saucer : GameObject {
             elapsed_time = 0f
     }
 
+    fun jump()
+    {
+        sprite.translateY(2f)
+    }
+
     private fun setPosition(pos:Vector2) {
-        originX = pos.x-width/2
-        originY = pos.y - height/2
+        sprite.setCenter(pos.x,pos.y)
+        //originX = pos.x-width/2
+        //originY = pos.y - height/2
     }
 
     fun setPosition(pos: Vector3) {
         setPosition(Vector2(pos.x,pos.y))
     }
 
-    override fun create(camera: Camera) {
+    override fun create(batch: SpriteBatch,camera: Camera) {
         // Frames loading from "charset.atlas"
         //Gdx.app.log("tag","creating Saucer")
         atlas = TextureAtlas(Gdx.files.internal("Saucer.atlas"))
         // Frames that compose the animation "running"
-        val runningFrames = atlas?.findRegions("Saucer")
+        val flyingFrames = atlas?.findRegions("Saucer")
         val dam1Frames = atlas?.findRegions("SaucerDam1")
         val dam2Frames = atlas?.findRegions("SaucerDam2")
         val dam3Frames = atlas?.findRegions("SaucerDam3")
         val crashFrames = atlas?.findRegions("SaucerCrash")
 
         // Building the animation
-        flyingAnimation = Animation(FRAME_DURATION, runningFrames, PlayMode.LOOP)
+        flyingAnimation = Animation(FRAME_DURATION, flyingFrames, PlayMode.LOOP)
         dam1Animation = Animation(FRAME_DURATION, dam1Frames, PlayMode.LOOP)
         dam2Animation = Animation(FRAME_DURATION, dam2Frames, PlayMode.LOOP)
         dam3Animation = Animation(FRAME_DURATION, dam3Frames, PlayMode.LOOP)
@@ -78,12 +82,15 @@ class Saucer : GameObject {
 
 
         // Calculates the x and y position to center the image
-        val firstTexture = runningFrames?.first()
+        val firstTexture = flyingFrames?.first()
         if(firstTexture != null) {
-            originX = 0f//(Gdx.graphics.width.toFloat() - firstTexture.regionWidth) / 2
-            originY = 0f//(Gdx.graphics.height.toFloat() - firstTexture.regionHeight) / 2
-            width = firstTexture.regionWidth.toFloat() *scaleX
-            height = firstTexture.regionHeight.toFloat() *scaleY
+            sprite = Sprite(firstTexture)
+            sprite.setOrigin(0f,0f)
+            sprite.setScale(scaleX,scaleY)
+            //originX = 0f//(Gdx.graphics.width.toFloat() - firstTexture.regionWidth) / 2
+            //originY = 0f//(Gdx.graphics.height.toFloat() - firstTexture.regionHeight) / 2
+            //width = firstTexture.regionWidth.toFloat() *scaleX
+            //height = firstTexture.regionHeight.toFloat() *scaleY
         }
     }
 
@@ -91,9 +98,10 @@ class Saucer : GameObject {
     }
 
     override fun render(batch: SpriteBatch,camera:Camera) {
-        //Gdx.app.log("tag","rendering Saucer")`
+        //Gdx.app.log("tag","rendering Saucer")
         // Elapsed time
-        elapsed_time += Gdx.graphics.deltaTime
+        if(CthulhuGame.gameState == CthulhuGame.RUN) elapsed_time += Gdx.graphics.deltaTime
+        //elapsed_time += Gdx.graphics.deltaTime
 
         // Getting the frame which must be rendered
         currentFrame = when(health)
@@ -107,7 +115,10 @@ class Saucer : GameObject {
         //currentFrame = flyingAnimation?.getKeyFrame(elapsed_time)!!
 
         // Drawing the frame
-        batch.draw(currentFrame, originX, originY, width, height)
+        //Gdx.app.log("tag","originX :$originX, originY :$originY")
+        sprite.setRegion(currentFrame)
+        sprite.draw(batch)
+        //batch.draw(currentFrame, originX, originY, width, height)
     }
     override fun dispose() {
         atlas?.dispose()
