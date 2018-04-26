@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -29,7 +30,7 @@ class GUIHelper(var game: CthulhuGame):GameObject {
     //private var scaleX = 1f
     //private var scaleY = 1f
 
-    override fun create(batch: SpriteBatch,camera: Camera) {
+    override fun create(batch: SpriteBatch,camera: Camera,world: World) {
         //stage = Stage(ExtendViewport(camera.viewportWidth,camera.viewportHeight,camera),batch)
         //stage = Stage(ExtendViewport(Gdx.graphics.width.toFloat(),Gdx.graphics.height.toFloat(),camera),batch)
         stage = Stage(ScreenViewport())
@@ -114,7 +115,7 @@ class GUIHelper(var game: CthulhuGame):GameObject {
         // Continue Button
         val button = TextButton("Continue", mySkin, "default")
         button.setSize(col_width*2, row_height)
-        button.setPosition((stage.width-col_width*2)/2, (stage.height)/2)
+        button.setPosition((stage.width-col_width*2)/2, stage.height/2)
         button.setColor(button.color.r,button.color.g,button.color.b,button.color.a/2)
         button.label.setAlignment(Align.center)
         button.addListener(object : InputListener() {
@@ -142,6 +143,22 @@ class GUIHelper(var game: CthulhuGame):GameObject {
             }
         })
         stage.addActor(button2)
+
+        //Debug Button
+        val button3 = TextButton("Debug", mySkin, "default")
+        button3.setSize(col_width*2, row_height)
+        button3.setPosition((stage.width-col_width*2)/2, (stage.height - row_height*6)/2)
+        button3.setColor(button2.color.r,button2.color.g,button2.color.b,button2.color.a/2)
+        button3.label.setAlignment(Align.center)
+        button3.addListener(object : InputListener() {
+            override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
+                game.debug = !game.debug
+            }
+            override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                return true
+            }
+        })
+        stage.addActor(button3)
     }
 
     private fun getRunScreen() {

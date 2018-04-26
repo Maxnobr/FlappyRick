@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.g2d.*
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.physics.box2d.Body
+import com.badlogic.gdx.physics.box2d.World
+import com.codeandweb.physicseditor.PhysicsShapeCache
 
 class Saucer : GameObject {
 
@@ -35,10 +38,13 @@ class Saucer : GameObject {
     private var width = 0f
     private var height = 0f
 
-    private var scaleX = .5f
-    private var scaleY = .5f
+    private var scaleX = .3f
+    private var scaleY = .3f
 
     private var health = 4
+
+    private lateinit var physicsBodies:PhysicsShapeCache
+    private lateinit var body: Body
 
     fun takeDamage(dam:Int)
     {
@@ -47,22 +53,28 @@ class Saucer : GameObject {
             elapsed_time = 0f
     }
 
-    fun jump()
+    fun reset()
     {
-        sprite.translateY(2f)
+        body.linearVelocity = Vector2()
     }
 
+    fun jump()
+    {
+        //body.applyLinearImpulse(0f, 1000f,0f, 0f, true)
+        body.linearVelocity = Vector2(0f,40f)
+        //sprite.translateY(2f)
+    }
+
+
     private fun setPosition(pos:Vector2) {
-        sprite.setCenter(pos.x,pos.y)
-        //originX = pos.x-width/2
-        //originY = pos.y - height/2
+        body.setTransform(pos.x - sprite.width/2,pos.y - sprite.height/2,0f)
     }
 
     fun setPosition(pos: Vector3) {
         setPosition(Vector2(pos.x,pos.y))
     }
 
-    override fun create(batch: SpriteBatch,camera: Camera) {
+    override fun create(batch: SpriteBatch,camera: Camera,world:World) {
         // Frames loading from "charset.atlas"
         //Gdx.app.log("tag","creating Saucer")
         atlas = TextureAtlas(Gdx.files.internal("Saucer.atlas"))
@@ -87,14 +99,17 @@ class Saucer : GameObject {
             sprite = Sprite(firstTexture)
             sprite.setOrigin(0f,0f)
             sprite.setScale(scaleX,scaleY)
-            //originX = 0f//(Gdx.graphics.width.toFloat() - firstTexture.regionWidth) / 2
-            //originY = 0f//(Gdx.graphics.height.toFloat() - firstTexture.regionHeight) / 2
-            //width = firstTexture.regionWidth.toFloat() *scaleX
-            //height = firstTexture.regionHeight.toFloat() *scaleY
         }
+
+        physicsBodies = PhysicsShapeCache("SaucerPhysics.xml")
+        body = physicsBodies.createBody("Saucer_0", world, sprite.scaleX,sprite.scaleY)
+        body.setTransform(sprite.originX,sprite.originY,sprite.rotation)
     }
 
     override fun preRender(camera:Camera) {
+        if(CthulhuGame.gameState == CthulhuGame.RUN) body.linearVelocity = Vector2(body.linearVelocity.x,body.linearVelocity.y - 1)
+        sprite.setPosition(body.position.x,body.position.y)
+        sprite.rotation = Math.toDegrees(body.angle.toDouble()).toFloat()
     }
 
     override fun render(batch: SpriteBatch,camera:Camera) {

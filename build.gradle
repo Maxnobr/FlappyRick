@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlinVersion = '1.2.31'
+    ext.kotlinVersion = '1.2.40'
 
     repositories {
         mavenLocal()
@@ -69,6 +69,7 @@ project(":core") {
         implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+        implementation "com.codeandweb.physicseditor:gdx-pe-loader:1.1.0"
     }
 }
 

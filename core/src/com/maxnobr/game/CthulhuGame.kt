@@ -1,20 +1,24 @@
 package com.maxnobr.game
 
 import com.badlogic.gdx.ApplicationAdapter
-import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
-import kotlin.collections.LinkedHashMap
+import com.badlogic.gdx.physics.box2d.Box2D
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
+import com.badlogic.gdx.physics.box2d.World
 
 class CthulhuGame : ApplicationAdapter() {
     private lateinit var batch: SpriteBatch
     private var list = LinkedHashMap<String,GameObject>()
-    lateinit var camera: OrthographicCamera
+    private lateinit var camera: OrthographicCamera
     private lateinit var introMsc:Music
+    var debug = false
+    private var readyToJump = true
 
     companion object {
         const val START = 0
@@ -22,26 +26,35 @@ class CthulhuGame : ApplicationAdapter() {
         const val PAUSE = 2
 
         var gameState = -1
+
+        private const val STEP_TIME = 1f / 60f
+        private const val VELOCITY_ITERATIONS = 6
+        private const val POSITION_ITERATIONS = 2
     }
+    var accumulator = 0f
+    private lateinit var world: World
+    private lateinit var debugRenderer: Box2DDebugRenderer
+
 
     override fun create() {
         batch = SpriteBatch()
 
-        introMsc = Gdx.audio.newMusic(Gdx.files.internal("intro8-Bit.mp3"))
+        Box2D.init()
+        world = World(Vector2(0f, -10f), true)
+        debugRenderer = Box2DDebugRenderer()
 
+        introMsc = Gdx.audio.newMusic(Gdx.files.internal("intro8-Bit.mp3"))
         introMsc.setLooping(true)
 
         camera = OrthographicCamera()
         camera.setToOrtho(false,80F,48F)
-        //viewport = ExtendViewport(80f, 48f, camera)
 
         list["background"] = Background()
         list["player"] = Saucer()
         list["gui"] = GUIHelper(this)
-        list.forEach {it.value.create(batch,camera)}
+        list.forEach {it.value.create(batch,camera,world)}
 
         changeGameState(START)
-        reset()
     }
 
     override fun render() {
@@ -49,23 +62,33 @@ class CthulhuGame : ApplicationAdapter() {
         batch.projectionMatrix = camera.combined
         Gdx.gl.glClearColor(0.57f, 0.77f, 0.85f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        /*
-        if (Gdx.input.isTouched(0)) {
-            val touchPos = Vector3()
-            touchPos.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(),0f)
-            camera.unproject(touchPos)
-            (list["player"] as Saucer).setPosition(touchPos)
-        }*/
 
         list.forEach { it.value.preRender(camera) }
         batch.begin()
         list.forEach { if(it.key != "gui")it.value.render(batch,camera) }
         batch.end()
+
+        if(gameState == RUN) {
+            stepWorld()
+            if(Gdx.input.isTouched){
+                if(readyToJump) {
+                    (list["player"] as Saucer).jump()
+                    readyToJump = false
+                }
+            }
+            else
+                readyToJump = true
+        }
+        if(debug) {
+            Gdx.gl.glClearColor(0f,0f,0f,1f)
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            debugRenderer.render(world, camera.combined)
+        }
+
         list["gui"]?.render(batch,camera)
     }
 
-    fun changeGameState(state:Int)
-    {
+    fun changeGameState(state:Int) {
         gameState = state
         when(gameState)
         {
@@ -84,15 +107,31 @@ class CthulhuGame : ApplicationAdapter() {
 
     override fun resume() {
         super.resume()
-        //if(gameState == RUN) changeGameState(PAUSE)
+        if(gameState == RUN) changeGameState(RUN)
     }
 
     private fun reset() {
+        debug = false
         (list["player"] as Saucer).setPosition(Vector3(camera.viewportWidth/2,camera.viewportHeight/2,0f))
+        (list["player"] as Saucer).reset()
+    }
+
+    private fun stepWorld() {
+        val delta = Gdx.graphics.deltaTime
+
+        accumulator += Math.min(delta, 0.25f)
+
+        if (accumulator >= STEP_TIME) {
+            accumulator -= STEP_TIME
+
+            world.step(STEP_TIME, VELOCITY_ITERATIONS, POSITION_ITERATIONS)
+        }
     }
 
     override fun dispose() {
         batch.dispose()
+        world.dispose()
+        debugRenderer.dispose()
         list.forEach { it.value.dispose() }
     }
 }

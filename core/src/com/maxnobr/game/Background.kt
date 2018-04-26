@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.physics.box2d.World
 
 class Background : GameObject  {
 
@@ -17,7 +18,7 @@ class Background : GameObject  {
     private var speed2 = -4f
     private var speed1 = -7f
 
-    override fun create(batch: SpriteBatch,camera: Camera) {
+    override fun create(batch: SpriteBatch,camera: Camera,world: World) {
         atlas = TextureAtlas(Gdx.files.internal("Background.atlas"))
         bg3 = Sprite(atlas?.findRegion("bglevel3"))
         bg2 = Sprite(atlas?.findRegion("bglevel2"))
