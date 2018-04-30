@@ -4,56 +4,56 @@ size: 1024,128
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-Cthulu
+Cthulhu
   rotate: false
   xy: 2, 2
   size: 120, 115
   orig: 120, 115
   offset: 0, 0
   index: 0
-Cthulu
+Cthulhu
   rotate: false
   xy: 124, 2
   size: 120, 115
   orig: 120, 115
   offset: 0, 0
   index: 1
-Cthulu
+Cthulhu
   rotate: false
   xy: 246, 2
   size: 120, 115
   orig: 120, 115
   offset: 0, 0
   index: 2
-Cthulu
+Cthulhu
   rotate: false
   xy: 368, 2
   size: 120, 115
   orig: 120, 115
   offset: 0, 0
   index: 3
-Cthulu
+Cthulhu
   rotate: false
   xy: 490, 2
   size: 120, 115
   orig: 120, 115
   offset: 0, 0
   index: 4
-Cthulu
+Cthulhu
   rotate: false
   xy: 612, 2
   size: 120, 115
   orig: 120, 115
   offset: 0, 0
   index: 5
-Cthulu
+Cthulhu
   rotate: false
   xy: 734, 2
   size: 120, 115
   orig: 120, 115
   offset: 0, 0
   index: 6
-Cthulu
+Cthulhu
   rotate: false
   xy: 856, 2
   size: 120, 115
