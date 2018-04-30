@@ -52,23 +52,23 @@ class Background : GameObject  {
     override fun render(batch: SpriteBatch,camera: Camera) {
         bg3.draw(batch)
         if(bg3.x < 0) {
-            bg3.translateX(camera.viewportWidth)
+            bg3.translateX(camera.viewportWidth-0.1f)
             bg3.draw(batch)
-            bg3.translateX(-camera.viewportWidth)
+            bg3.translateX(-camera.viewportWidth+0.1f)
         }
 
         bg2.draw(batch)
         if(bg2.x < 0) {
-            bg2.translateX(camera.viewportWidth)
+            bg2.translateX(camera.viewportWidth-0.1f)
             bg2.draw(batch)
-            bg2.translateX(-camera.viewportWidth)
+            bg2.translateX(-camera.viewportWidth+0.1f)
         }
 
         bg1.draw(batch)
         if(bg1.x < 0) {
-            bg1.translateX(camera.viewportWidth)
+            bg1.translateX(camera.viewportWidth-0.1f)
             bg1.draw(batch)
-            bg1.translateX(-camera.viewportWidth)
+            bg1.translateX(-camera.viewportWidth+0.1f)
         }
     }
 

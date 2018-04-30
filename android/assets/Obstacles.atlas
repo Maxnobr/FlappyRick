@@ -1,0 +1,20 @@
+
+Obstacles.png
+size: 128,128
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+bottomV2
+  rotate: false
+  xy: 36, 2
+  size: 32, 86
+  orig: 32, 86
+  offset: 0, 0
+  index: -1
+topV2
+  rotate: false
+  xy: 2, 2
+  size: 32, 86
+  orig: 32, 86
+  offset: 0, 0
+  index: -1

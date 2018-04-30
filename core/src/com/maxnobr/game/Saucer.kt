@@ -12,13 +12,9 @@ import com.codeandweb.physicseditor.PhysicsShapeCache
 
 class Saucer : GameObject {
 
-    // Time while each frame keeps on screen
     private val FRAME_DURATION = .4f
-
-    // Atlas with the definition of the frames "charset.atlas"
     private var atlas: TextureAtlas? = null
 
-    // Frame that must be rendered at each time
     private lateinit var currentFrame: TextureRegion
     private lateinit var sprite: Sprite
 
@@ -32,19 +28,15 @@ class Saucer : GameObject {
     // Elapsed time
     private var elapsed_time = 0f
 
-    // Auxiliar variables to know where to draw the picture to center it on the screen
-    private var originX: Float = 0f
-    private var originY: Float = 0f
-    private var width = 0f
-    private var height = 0f
-
-    private var scaleX = .3f
-    private var scaleY = .3f
+    private var scaleX = .2f
+    private var scaleY = .2f
 
     private var health = 4
 
     private lateinit var physicsBodies:PhysicsShapeCache
     private lateinit var body: Body
+    private var gravityScale = 20f
+    private val jump = 60f
 
     fun takeDamage(dam:Int)
     {
@@ -61,7 +53,7 @@ class Saucer : GameObject {
     fun jump()
     {
         //body.applyLinearImpulse(0f, 1000f,0f, 0f, true)
-        body.linearVelocity = Vector2(0f,40f)
+        body.linearVelocity = Vector2(0f,jump)
         //sprite.translateY(2f)
     }
 
@@ -92,7 +84,6 @@ class Saucer : GameObject {
         dam3Animation = Animation(FRAME_DURATION, dam3Frames, PlayMode.LOOP)
         crashAnimation = Animation(FRAME_DURATION, crashFrames, PlayMode.NORMAL)
 
-
         // Calculates the x and y position to center the image
         val firstTexture = flyingFrames?.first()
         if(firstTexture != null) {
@@ -104,10 +95,11 @@ class Saucer : GameObject {
         physicsBodies = PhysicsShapeCache("SaucerPhysics.xml")
         body = physicsBodies.createBody("Saucer_0", world, sprite.scaleX,sprite.scaleY)
         body.setTransform(sprite.originX,sprite.originY,sprite.rotation)
+        body.gravityScale = gravityScale
     }
 
     override fun preRender(camera:Camera) {
-        if(CthulhuGame.gameState == CthulhuGame.RUN) body.linearVelocity = Vector2(body.linearVelocity.x,body.linearVelocity.y - 1)
+        //if(CthulhuGame.gameState == CthulhuGame.RUN) body.linearVelocity = Vector2(body.linearVelocity.x,body.linearVelocity.y - 1)
         sprite.setPosition(body.position.x,body.position.y)
         sprite.rotation = Math.toDegrees(body.angle.toDouble()).toFloat()
     }

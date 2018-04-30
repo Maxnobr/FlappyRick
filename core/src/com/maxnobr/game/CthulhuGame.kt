@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.box2d.Box2D
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
+import com.maxnobr.game.level.Obstacles
 
 //Test to push
 class CthulhuGame : ApplicationAdapter() {
@@ -51,7 +52,9 @@ class CthulhuGame : ApplicationAdapter() {
         camera.setToOrtho(false,80F,48F)
 
         list["background"] = Background()
+        list["obstacles"] = Obstacles()
         list["player"] = Saucer()
+        list["Cthulhu"] = Cthulhu()
         list["gui"] = GUIHelper(this)
         list.forEach {it.value.create(batch,camera,world)}
 
@@ -64,7 +67,7 @@ class CthulhuGame : ApplicationAdapter() {
         Gdx.gl.glClearColor(0.57f, 0.77f, 0.85f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        list.forEach { it.value.preRender(camera) }
+        if(gameState == RUN) list.forEach { it.value.preRender(camera) }
         batch.begin()
         list.forEach { if(it.key != "gui")it.value.render(batch,camera) }
         batch.end()
@@ -113,6 +116,7 @@ class CthulhuGame : ApplicationAdapter() {
 
     private fun reset() {
         debug = false
+        (list["obstacles"] as Obstacles).reset()
         (list["player"] as Saucer).setPosition(Vector3(camera.viewportWidth/2,camera.viewportHeight/2,0f))
         (list["player"] as Saucer).reset()
     }

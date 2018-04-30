@@ -72,6 +72,44 @@ scaleFactors=[{suffix:"",factor:1}]
 inputFiles=[{path:Rick_and_Morty_Saucer_clone/Saucer_0.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_clone/Saucer_5.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_clone/Saucer_1.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_clone/Saucer_2.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_clone/Saucer_3.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_clone/Saucer_4.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Crash_and_Burn/SaucerCrash_0.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Crash_and_Burn/SaucerCrash_9.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Crash_and_Burn/SaucerCrash_1.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Crash_and_Burn/SaucerCrash_10.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Crash_and_Burn/SaucerCrash_11.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Crash_and_Burn/SaucerCrash_12.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Crash_and_Burn/SaucerCrash_13.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Crash_and_Burn/SaucerCrash_2.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Crash_and_Burn/SaucerCrash_3.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Crash_and_Burn/SaucerCrash_4.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Crash_and_Burn/SaucerCrash_6.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Crash_and_Burn/SaucerCrash_7.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Crash_and_Burn/SaucerCrash_8.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_1_3_clone/SaucerDam1_0.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_1_3_clone/SaucerDam1_5.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_1_3_clone/SaucerDam1_1.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_1_3_clone/SaucerDam1_2.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_1_3_clone/SaucerDam1_3.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_1_3_clone/SaucerDam1_4.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_2_3_clone/SaucerDam2_5.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_2_3_clone/SaucerDam2_0.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_2_3_clone/SaucerDam2_1.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_2_3_clone/SaucerDam2_2.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_2_3_clone/SaucerDam2_3.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_2_3_clone/SaucerDam2_4.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_3_3_clone/SaucerDam3_0.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_3_3_clone/SaucerDam3_6.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_3_3_clone/SaucerDam3_1.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_3_3_clone/SaucerDam3_3.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_3_3_clone/SaucerDam3_4.png,type:Input,regionName:null},{path:Rick_and_Morty_Saucer_Damaged_3_3_clone/SaucerDam3_5.png,type:Input,regionName:null}]
 
 
+---
+
+name=Obstacles
+filename=
+output=../android/assets
+
+alias=true
+alphaThreshold=0
+debug=false
+duplicatePadding=false
+edgePadding=true
+fast=false
+filterMag=Nearest
+filterMin=Nearest
+ignoreBlankImages=true
+maxHeight=2048
+maxWidth=2048
+minHeight=16
+minWidth=16
+paddingX=2
+paddingY=2
+pot=true
+rotation=false
+stripWhitespaceX=false
+stripWhitespaceY=false
+wrapX=ClampToEdge
+wrapY=ClampToEdge
+premultiplyAlpha=false
+grid=false
+square=false
+bleed=true
+limitMemory=true
+useIndexes=true
+
+scaleFactors=[{suffix:"",factor:1}]
+inputFiles=[{path:obstacles/topV2.png,type:Input,regionName:null},{path:obstacles/bottomV2.png,type:Input,regionName:null}]
+
+
 -PROJ-
 
 version=4.6.0
