@@ -120,6 +120,7 @@ class GUIHelper(var game: CthulhuGame):GameObject {
         button.label.setAlignment(Align.center)
         button.addListener(object : InputListener() {
             override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
+                //game.delete(SINGLEGAMENAME)
                 game.changeGameState(RUN)
             }
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {

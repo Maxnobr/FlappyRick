@@ -1,6 +1,8 @@
 package com.maxnobr.game
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
@@ -24,6 +26,10 @@ class Saucer(private val game: CthulhuGame) : GameObject {
     private var isBlinking = false
     private val invisibilityLength = 5f
     private var atlas: TextureAtlas? = null
+
+    private lateinit var blastSd:Sound
+    private lateinit var invinsSd:Music
+    //private var invinsSdID = 0.toLong()
 
     private lateinit var currentFrame: TextureRegion
     private lateinit var sprite: Sprite
@@ -58,6 +64,8 @@ class Saucer(private val game: CthulhuGame) : GameObject {
             interVec = body.position
             invisibilityBlink = invisibilityBlinkMax
             blinkTimer = 0f
+            //invinsSdID = invinsSd.play(1.0f)
+            //invinsSd.setLooping(invinsSdID,true)
         }
     }
 
@@ -67,8 +75,10 @@ class Saucer(private val game: CthulhuGame) : GameObject {
     }
 
     fun jump() {
-        if(!isInvinsible)
-            body.linearVelocity = Vector2(0f,jump)
+        if(!isInvinsible) {
+            body.linearVelocity = Vector2(0f, jump)
+            blastSd.play(.5f)
+        }
     }
 
     private fun setPosition(pos:Vector2) {
@@ -82,6 +92,12 @@ class Saucer(private val game: CthulhuGame) : GameObject {
     override fun create(batch: SpriteBatch,camera: Camera,world:World) {
         // Frames loading from "charset.atlas"
         //Gdx.app.log("tag","creating Saucer")
+
+        blastSd = Gdx.audio.newSound(Gdx.files.internal("257232__javierzumer__retro-shot-blaster.wav"))
+        invinsSd = Gdx.audio.newMusic(Gdx.files.internal("328011__astrand__retro-blaster-fire.wav"))
+        invinsSd.volume = .4f
+        invinsSd.setLooping(true)
+
         atlas = TextureAtlas(Gdx.files.internal("Saucer.atlas"))
         // Frames that compose the animation "running"
         val flyingFrames = atlas?.findRegions("Saucer")
@@ -117,6 +133,7 @@ class Saucer(private val game: CthulhuGame) : GameObject {
         //if(CthulhuGame.gameState == CthulhuGame.RUN) body.linearVelocity = Vector2(body.linearVelocity.x,body.linearVelocity.y - 1)
 
         if((CthulhuGame.gameState == CthulhuGame.RUN) and isInvinsible) {
+            if(!invinsSd.isPlaying) invinsSd.play()
             body.setTransform(interVec.interpolate(
                     Vector2((camera.viewportWidth - sprite.width * scaleX) / 2,
                             (camera.viewportHeight - sprite.height * scaleY) / 2),
@@ -138,8 +155,14 @@ class Saucer(private val game: CthulhuGame) : GameObject {
                 isInvinsible = false
                 body.isActive = true
                 body.linearVelocity = Vector2()
+                invinsSd.stop()
+                //invinsSd.play()
+                //invinsSd.setLooping(invinsSdID,false)
             }
         }
+
+        if(invinsSd.isPlaying && CthulhuGame.gameState != CthulhuGame.RUN)
+            invinsSd.stop()
         sprite.setPosition(body.position.x,body.position.y)
         sprite.rotation = Math.toDegrees(body.angle.toDouble()).toFloat()
     }
@@ -171,6 +194,8 @@ class Saucer(private val game: CthulhuGame) : GameObject {
 
     override fun dispose() {
         atlas?.dispose()
+        invinsSd.dispose()
+        blastSd.dispose()
     }
 
     override fun save(data: Persistence.GameData){

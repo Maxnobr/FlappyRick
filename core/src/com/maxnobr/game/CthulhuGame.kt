@@ -21,6 +21,7 @@ class CthulhuGame : ApplicationAdapter() {
     private var list = LinkedHashMap<String,GameObject>()
     private lateinit var camera: OrthographicCamera
     private lateinit var introMsc:Music
+    private lateinit var gameMsc:Music
     var debug = true
     private var readyToJump = true
 
@@ -58,6 +59,9 @@ class CthulhuGame : ApplicationAdapter() {
 
         introMsc = Gdx.audio.newMusic(Gdx.files.internal("intro8-Bit.mp3"))
         introMsc.setLooping(true)
+
+        gameMsc = Gdx.audio.newMusic(Gdx.files.internal("angryJoe.mp3"))
+        gameMsc.setLooping(true)
 
         camera = OrthographicCamera()
         camera.setToOrtho(false,80F,48F)
@@ -116,6 +120,7 @@ class CthulhuGame : ApplicationAdapter() {
         {
             START -> {
                 introMsc.play()
+                gameMsc.stop()
                 reset()
                 Gdx.app.log("CRUD","file exists : $fileExists")
             }
@@ -126,6 +131,7 @@ class CthulhuGame : ApplicationAdapter() {
                 delete(SINGLEGAMENAME)
             }
             else -> {
+                gameMsc.play()
                 introMsc.stop()
             }
         }
@@ -172,6 +178,8 @@ class CthulhuGame : ApplicationAdapter() {
         batch.dispose()
         world.dispose()
         debugRenderer.dispose()
+        gameMsc.dispose()
+        introMsc.dispose()
         list.forEach { it.value.dispose() }
     }
 

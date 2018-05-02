@@ -1,0 +1,34 @@
+
+Cave.png
+size: 2048,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+cave
+  rotate: false
+  xy: 2, 484
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: 0
+cave
+  rotate: false
+  xy: 2, 2
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: 1
+cave
+  rotate: false
+  xy: 804, 484
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: 2
+cave
+  rotate: false
+  xy: 804, 2
+  size: 800, 480
+  orig: 800, 480
+  offset: 0, 0
+  index: 3
