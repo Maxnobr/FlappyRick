@@ -51,15 +51,6 @@ class CthulhuGame : ApplicationAdapter() {
 
     override fun create() {
         batch = SpriteBatch()
-        /*
-        val file= Gdx.files.local("files/myFile.txt")
-        file.writeString("firstLine\n", false)
-        file.writeString("SecondLine",true)
-
-        val lines = file.readString().split("\n".toRegex())
-        Gdx.app.log("CRUD","loaded message is :'$lines'")
-        */
-        //Gdx.files.local(CthulhuGame.FILE).delete()
 
         Box2D.init()
         world = World(Vector2(0f, -10f), true)
@@ -124,7 +115,6 @@ class CthulhuGame : ApplicationAdapter() {
         when(gameState)
         {
             START -> {
-                fileExists = persistence.hasData
                 introMsc.play()
                 reset()
                 Gdx.app.log("CRUD","file exists : $fileExists")
@@ -132,10 +122,15 @@ class CthulhuGame : ApplicationAdapter() {
             PAUSE -> {
                 save(SINGLEGAMENAME)
             }
+            WINNIG, GAMEOVER -> {
+                delete(SINGLEGAMENAME)
+            }
             else -> {
                 introMsc.stop()
             }
         }
+        fileExists = persistence.hasData
+
     }
 
     override fun pause() {
@@ -186,5 +181,10 @@ class CthulhuGame : ApplicationAdapter() {
 
     fun load(saveName:String) {
         persistence.load(saveName,list)
+    }
+
+    fun delete(saveName:String)
+    {
+        persistence.delete(saveName)
     }
 }

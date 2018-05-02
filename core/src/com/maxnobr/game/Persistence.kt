@@ -15,42 +15,6 @@ class Persistence {
     var processing = true
     var hasData = false
 
-    fun save(saveName:String,list:LinkedHashMap<String,GameObject>) {
-        if(saves[saveName] == null)
-            saves[saveName] = GameData(saveName)
-        Gdx.app.log("CRUD","saving data to GameData")
-        list.forEach { it.value.save(saves[saveName]!!)}
-        Gdx.app.log("CRUD","finished saving data to GameData")
-
-        thread {
-            Gdx.app.log("CRUD","writing data")
-
-            file.writeString("${saves.size}\n",false)
-
-            saves.forEach {
-                it.value.write()
-                file.writeString("\n",true)
-            }
-            hasData = true
-            processing = false
-            Gdx.app.log("CRUD","finished writing data")
-            Gdx.app.log("CRUD","data : \n${file.readString()}")
-
-        }
-    }
-
-    fun load(saveName:String,list:LinkedHashMap<String,GameObject>) {
-        Gdx.app.log("CRUD","trying to load $saveName")
-        if(saves[saveName] != null) {
-            list.forEach { it.value.load(saves[saveName]!!) }
-            Gdx.app.log("CRUD","loaded GameData")
-
-        }
-        else
-            Gdx.app.log("CRUD","no data here..")
-
-    }
-
     init {
         if(file.exists())
             thread {
@@ -73,6 +37,50 @@ class Persistence {
             processing = false
         }
 
+    }
+
+    fun save(saveName:String,list:LinkedHashMap<String,GameObject>) {
+        if(saves[saveName] == null)
+            saves[saveName] = GameData(saveName)
+        Gdx.app.log("CRUD","saving data to GameData")
+        list.forEach { it.value.save(saves[saveName]!!)}
+        Gdx.app.log("CRUD","finished saving data to GameData")
+        writeAll()
+    }
+
+    private fun writeAll(){
+        thread {
+            processing = true
+            Gdx.app.log("CRUD","writing data")
+
+            file.writeString("${saves.size}\n",false)
+
+            saves.forEach {
+                it.value.write()
+                file.writeString("\n",true)
+            }
+            hasData = saves.size > 0
+            processing = false
+            Gdx.app.log("CRUD","finished writing data")
+            Gdx.app.log("CRUD","data : \n${file.readString()}")
+        }
+    }
+
+    fun load(saveName:String,list:LinkedHashMap<String,GameObject>) {
+        Gdx.app.log("CRUD","trying to load $saveName")
+        if(saves[saveName] != null) {
+            list.forEach { it.value.load(saves[saveName]!!) }
+            Gdx.app.log("CRUD","loaded GameData")
+
+        }
+        else
+            Gdx.app.log("CRUD","no data here..")
+
+    }
+
+    fun delete(saveName:String) {
+        saves.remove(saveName)
+        writeAll()
     }
 
     inner class GameData(var saveName:String){

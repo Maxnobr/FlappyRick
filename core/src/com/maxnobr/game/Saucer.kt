@@ -164,7 +164,7 @@ class Saucer(private val game: CthulhuGame) : GameObject {
         sprite.setRegion(currentFrame)
         sprite.draw(batch)
 
-        if(health <= 0 && crashAnimation?.isAnimationFinished(elapsed_time)!!)
+        if(CthulhuGame.gameState == CthulhuGame.RUN && health <= 0 && crashAnimation?.isAnimationFinished(elapsed_time)!!)
             game.changeGameState(CthulhuGame.GAMEOVER)
         //batch.draw(currentFrame, originX, originY, width, height)
     }
