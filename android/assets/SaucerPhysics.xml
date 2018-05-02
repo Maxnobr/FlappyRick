@@ -4,10 +4,10 @@
 
 	<body name="Saucer_0">
 		<is_dynamic/>
+		<is_bullet/>
 		<linear_damping>0</linear_damping>
 		<angular_damping>0</angular_damping>
 		<fixed_rotation/>
-		<allow_sleep/>
 		<fixture>
 			<density>2</density>
 			<friction>0</friction>

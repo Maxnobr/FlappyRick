@@ -3,6 +3,7 @@ package com.maxnobr.game
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -11,21 +12,23 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.box2d.Box2D
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
+import com.maxnobr.game.level.LevelBorders
 import com.maxnobr.game.level.Obstacles
 
-//Test to push
 class CthulhuGame : ApplicationAdapter() {
     private lateinit var batch: SpriteBatch
     private var list = LinkedHashMap<String,GameObject>()
     private lateinit var camera: OrthographicCamera
     private lateinit var introMsc:Music
-    var debug = false
+    var debug = true
     private var readyToJump = true
 
     companion object {
         const val START = 0
         const val RUN = 1
         const val PAUSE = 2
+        const val GAMEOVER = 3
+        const val WINNIG = 4
 
         var gameState = -1
 
@@ -37,9 +40,16 @@ class CthulhuGame : ApplicationAdapter() {
     private lateinit var world: World
     private lateinit var debugRenderer: Box2DDebugRenderer
 
-
     override fun create() {
         batch = SpriteBatch()
+
+
+        val file= Gdx.files.local("files/myFile.txt")
+        file.writeString("firstLine\n", false)
+        file.writeString("SecondLine",true)
+
+        val lines = file.readString().split("\n".toRegex())
+        Gdx.app.log("CRUD","loaded message is :'$lines'")
 
         Box2D.init()
         world = World(Vector2(0f, -10f), true)
@@ -53,10 +63,12 @@ class CthulhuGame : ApplicationAdapter() {
 
         list["background"] = Background()
         list["obstacles"] = Obstacles()
-        list["player"] = Saucer()
+        list["player"] = Saucer(this)
         list["Cthulhu"] = Cthulhu()
         list["gui"] = GUIHelper(this)
         list.forEach {it.value.create(batch,camera,world)}
+
+        LevelBorders(this,world,camera)
 
         changeGameState(START)
     }
@@ -111,7 +123,7 @@ class CthulhuGame : ApplicationAdapter() {
 
     override fun resume() {
         super.resume()
-        if(gameState == RUN) changeGameState(RUN)
+        //if(gameState == RUN) changeGameState(RUN)
     }
 
     private fun reset() {
@@ -119,6 +131,10 @@ class CthulhuGame : ApplicationAdapter() {
         (list["obstacles"] as Obstacles).reset()
         (list["player"] as Saucer).setPosition(Vector3(camera.viewportWidth/2,camera.viewportHeight/2,0f))
         (list["player"] as Saucer).reset()
+    }
+
+    fun getHurt(){
+        (list["player"] as Saucer).takeDamage(1)
     }
 
     private fun stepWorld() {

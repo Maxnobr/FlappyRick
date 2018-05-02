@@ -15,9 +15,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.ScreenViewport
+import com.maxnobr.game.CthulhuGame.Companion.GAMEOVER
 import com.maxnobr.game.CthulhuGame.Companion.PAUSE
 import com.maxnobr.game.CthulhuGame.Companion.RUN
 import com.maxnobr.game.CthulhuGame.Companion.START
+import com.maxnobr.game.CthulhuGame.Companion.WINNIG
 import com.maxnobr.game.CthulhuGame.Companion.gameState
 
 
@@ -54,6 +56,14 @@ class GUIHelper(var game: CthulhuGame):GameObject {
             }
             PAUSE ->{
                 if(screenState != gameState) getPauseScreen()
+                Gdx.gl.glClearColor(1f, 1f, 1f, .5f)
+            }
+            GAMEOVER ->{
+                if(screenState != gameState) getLostScreen()
+                Gdx.gl.glClearColor(1f, 1f, 1f, .5f)
+            }
+            WINNIG ->{
+                if(screenState != gameState) getWonScreen()
                 Gdx.gl.glClearColor(1f, 1f, 1f, .5f)
             }
             RUN ->{
@@ -153,6 +163,7 @@ class GUIHelper(var game: CthulhuGame):GameObject {
         button3.addListener(object : InputListener() {
             override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
                 game.debug = !game.debug
+                //game.getHurt()
             }
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                 return true
@@ -172,6 +183,66 @@ class GUIHelper(var game: CthulhuGame):GameObject {
         button.addListener(object : InputListener() {
             override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
                 game.changeGameState(PAUSE)
+            }
+            override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                return true
+            }
+        })
+        stage.addActor(button)
+    }
+
+    private fun getWonScreen() {
+        stage.clear()
+
+        val Help_Guides = 6
+        val row_height = stage.height / Help_Guides
+        val col_width = stage.width / Help_Guides
+
+        val title = Label("YOU WON !", mySkin, "title")
+        title.setSize(stage.width, (row_height * 2))
+        title.setPosition(0f, (Gdx.graphics.height - row_height * 2))
+        title.setAlignment(Align.center)
+        stage.addActor(title)
+
+        // GoBack Button
+        val button = TextButton("Quit", mySkin, "default")
+        button.setSize(col_width*2, row_height)
+        button.setPosition((stage.width-col_width*2)/2, stage.height/2)
+        button.setColor(button.color.r,button.color.g,button.color.b,button.color.a/2)
+        button.label.setAlignment(Align.center)
+        button.addListener(object : InputListener() {
+            override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
+                game.changeGameState(START)
+            }
+            override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                return true
+            }
+        })
+        stage.addActor(button)
+    }
+
+    private fun getLostScreen() {
+        stage.clear()
+
+        val Help_Guides = 6
+        val row_height = stage.height / Help_Guides
+        val col_width = stage.width / Help_Guides
+
+        val title = Label("GAME OVER", mySkin, "title")
+        title.setSize(stage.width, (row_height * 2))
+        title.setPosition(0f, (Gdx.graphics.height - row_height * 2))
+        title.setAlignment(Align.center)
+        stage.addActor(title)
+
+        // GoBack Button
+        val button = TextButton("Quit", mySkin, "default")
+        button.setSize(col_width*2, row_height)
+        button.setPosition((stage.width-col_width*2)/2, stage.height/2)
+        button.setColor(button.color.r,button.color.g,button.color.b,button.color.a/2)
+        button.label.setAlignment(Align.center)
+        button.addListener(object : InputListener() {
+            override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
+                game.changeGameState(START)
             }
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                 return true

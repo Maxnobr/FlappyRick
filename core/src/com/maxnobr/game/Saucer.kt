@@ -2,17 +2,26 @@ package com.maxnobr.game
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.*
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.World
 import com.codeandweb.physicseditor.PhysicsShapeCache
+import com.maxnobr.game.level.LevelBorders
 
-class Saucer : GameObject {
+class Saucer(private val game: CthulhuGame) : GameObject {
 
+    private var interVec = Vector2()
     private val FRAME_DURATION = .4f
+    private val invisibilityBlinkMax = 1f
+    private var invisibilityBlink = 1f
+    private var blinkTimer = 0f
+    private var isBlinking = false
+    private val invisibilityLength = 5f
     private var atlas: TextureAtlas? = null
 
     private lateinit var currentFrame: TextureRegion
@@ -37,26 +46,29 @@ class Saucer : GameObject {
     private lateinit var body: Body
     private var gravityScale = 20f
     private val jump = 60f
+    private var isInvinsible = false
 
-    fun takeDamage(dam:Int)
-    {
-        health -= dam
-        if(health <1)
+    fun takeDamage(dam:Int){
+        if(!isInvinsible) {
+            isInvinsible = true
+            health -= dam
             elapsed_time = 0f
+            body.isActive = false
+            interVec = body.position
+            invisibilityBlink = invisibilityBlinkMax
+            blinkTimer = 0f
+        }
     }
 
-    fun reset()
-    {
+    fun reset() {
         body.linearVelocity = Vector2()
+        health = 4
     }
 
-    fun jump()
-    {
-        //body.applyLinearImpulse(0f, 1000f,0f, 0f, true)
-        body.linearVelocity = Vector2(0f,jump)
-        //sprite.translateY(2f)
+    fun jump() {
+        if(!isInvinsible)
+            body.linearVelocity = Vector2(0f,jump)
     }
-
 
     private fun setPosition(pos:Vector2) {
         body.setTransform(pos.x - sprite.width/2,pos.y - sprite.height/2,0f)
@@ -96,21 +108,46 @@ class Saucer : GameObject {
         body = physicsBodies.createBody("Saucer_0", world, sprite.scaleX,sprite.scaleY)
         body.setTransform(sprite.originX,sprite.originY,sprite.rotation)
         body.gravityScale = gravityScale
+        body.fixtureList.forEach { it.filterData.categoryBits = LevelBorders.CATEGORY_PLAYER; it.filterData.maskBits = LevelBorders.MASK_PLAYER}
+        body.userData = "player"
     }
 
     override fun preRender(camera:Camera) {
         //if(CthulhuGame.gameState == CthulhuGame.RUN) body.linearVelocity = Vector2(body.linearVelocity.x,body.linearVelocity.y - 1)
+
+        if((CthulhuGame.gameState == CthulhuGame.RUN) and isInvinsible) {
+            body.setTransform(interVec.interpolate(
+                    Vector2((camera.viewportWidth - sprite.width * scaleX) / 2,
+                            (camera.viewportHeight - sprite.height * scaleY) / 2),
+                    Math.min(1f, elapsed_time / invisibilityLength), Interpolation.linear), 0f)
+
+            if(health > 0){
+                blinkTimer += Gdx.graphics.deltaTime
+                if (blinkTimer  > invisibilityBlink) {
+                    invisibilityBlink = invisibilityBlinkMax/(Math.max(Math.min(1f,elapsed_time/invisibilityLength),.1f)*10)
+                    blinkTimer = 0f
+                    isBlinking = !isBlinking
+                }
+                val a = if (isBlinking) .3f else .8f
+                sprite.setColor(sprite.color.r,sprite.color.g,sprite.color.b,a)
+            }
+
+            if(elapsed_time > invisibilityLength) {
+                sprite.setColor(sprite.color.r,sprite.color.g,sprite.color.b,1f)
+                isInvinsible = false
+                body.isActive = true
+                body.linearVelocity = Vector2()
+            }
+        }
         sprite.setPosition(body.position.x,body.position.y)
         sprite.rotation = Math.toDegrees(body.angle.toDouble()).toFloat()
     }
 
     override fun render(batch: SpriteBatch,camera:Camera) {
-        //Gdx.app.log("tag","rendering Saucer")
-        // Elapsed time
-        if(CthulhuGame.gameState == CthulhuGame.RUN) elapsed_time += Gdx.graphics.deltaTime
-        //elapsed_time += Gdx.graphics.deltaTime
+        if(CthulhuGame.gameState == CthulhuGame.RUN) {
+            elapsed_time += Gdx.graphics.deltaTime
+        }
 
-        // Getting the frame which must be rendered
         currentFrame = when(health)
         {
             4 -> flyingAnimation?.getKeyFrame(elapsed_time)!!
@@ -125,8 +162,12 @@ class Saucer : GameObject {
         //Gdx.app.log("tag","originX :$originX, originY :$originY")
         sprite.setRegion(currentFrame)
         sprite.draw(batch)
+
+        if(health <= 0 && crashAnimation?.isAnimationFinished(elapsed_time)!!)
+            game.changeGameState(CthulhuGame.GAMEOVER)
         //batch.draw(currentFrame, originX, originY, width, height)
     }
+
     override fun dispose() {
         atlas?.dispose()
     }

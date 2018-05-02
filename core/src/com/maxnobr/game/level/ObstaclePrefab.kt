@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
+import com.badlogic.gdx.physics.box2d.BodyDef
+import com.badlogic.gdx.physics.box2d.FixtureDef
 import com.badlogic.gdx.physics.box2d.World
 import com.codeandweb.physicseditor.PhysicsShapeCache
 import com.maxnobr.game.GameObject
@@ -55,15 +57,24 @@ class ObstaclePrefab(private var atlas: TextureAtlas,private var physicsBodies: 
 
     fun findBody(name:String) : Body{
 
-        if(bodies[name]!!.isEmpty()) {
-            bodies[name]?.add(physicsBodies.createBody(name, world, sprites[name]!!.scaleX, sprites[name]!!.scaleY))
-            bodies[name]?.peekFirst()!!.setTransform(sprites[name]!!.originX, sprites[name]!!.originY, sprites[name]!!.rotation)
-        }
+        val result:Body
 
-        return bodies[name]!!.poll()
+        if(bodies[name]!!.isEmpty()) {
+            result = physicsBodies.createBody(name, world, sprites[name]!!.scaleX, sprites[name]!!.scaleY)
+            result.fixtureList.forEach { it.filterData.categoryBits = LevelBorders.CATEGORY_LEVEL; it.filterData.maskBits = LevelBorders.MASK_LEVEL}
+            result.userData = "obstacle"
+            result.type = BodyDef.BodyType.KinematicBody
+            result.setTransform(sprites[name]!!.originX, sprites[name]!!.originY, sprites[name]!!.rotation)
+        }
+        else {
+            result = bodies[name]!!.poll()
+            result.isActive = true
+        }
+        return result
     }
 
     fun loseBody(name:String,body: Body) {
+        body.isActive = false
         bodies[name]?.add(body)
     }
 

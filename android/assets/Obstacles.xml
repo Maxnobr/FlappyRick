@@ -3,7 +3,6 @@
 <bodydef>
 
 	<body name="bottomV2">
-		<is_dynamic/>
 		<linear_damping>0</linear_damping>
 		<angular_damping>0</angular_damping>
 		<allow_sleep/>
@@ -24,7 +23,6 @@
 	</body>
 
 	<body name="topV2">
-		<is_dynamic/>
 		<linear_damping>0</linear_damping>
 		<angular_damping>0</angular_damping>
 		<allow_sleep/>
