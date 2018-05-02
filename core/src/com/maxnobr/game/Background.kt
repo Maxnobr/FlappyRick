@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.World
 class Background : GameObject  {
 
     private var atlas: TextureAtlas? = null
+    private lateinit var bg0:Sprite
     private lateinit var bg1:Sprite
     private lateinit var bg2:Sprite
     private lateinit var bg3:Sprite
@@ -20,10 +21,11 @@ class Background : GameObject  {
     private var speed1 = -7f
 
     override fun create(batch: SpriteBatch,camera: Camera,world: World) {
-        atlas = TextureAtlas(Gdx.files.internal("Background.atlas"))
-        bg3 = Sprite(atlas?.findRegion("bglevel3"))
-        bg2 = Sprite(atlas?.findRegion("bglevel2"))
-        bg1 = Sprite(atlas?.findRegion("bglevel1"))
+        atlas = TextureAtlas(Gdx.files.internal("Cave.atlas"))
+        bg3 = Sprite(atlas?.findRegions("cave")?.get(1))
+        bg2 = Sprite(atlas?.findRegions("cave")?.get(2))
+        bg1 = Sprite(atlas?.findRegions("cave")?.get(3))
+        bg0 = Sprite(atlas?.findRegions("cave")?.get(0))
 
         val scaleX = camera.viewportWidth/bg3.regionWidth.toFloat()
         val scaleY = camera.viewportHeight/bg3.regionHeight.toFloat()
@@ -31,10 +33,12 @@ class Background : GameObject  {
         bg3.setOrigin(0f,0f)
         bg2.setOrigin(0f,0f)
         bg1.setOrigin(0f,0f)
+        bg0.setOrigin(0f,0f)
 
         bg3.setScale(scaleX,scaleY)
         bg2.setScale(scaleX,scaleY)
         bg1.setScale(scaleX,scaleY)
+        bg0.setScale(scaleX,scaleY)
     }
 
     override fun preRender(camera:Camera) {
@@ -51,6 +55,8 @@ class Background : GameObject  {
     }
 
     override fun render(batch: SpriteBatch,camera: Camera) {
+        bg0.draw(batch)
+
         bg3.draw(batch)
         if(bg3.x < 0) {
             bg3.translateX(camera.viewportWidth-0.1f)
