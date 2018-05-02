@@ -100,20 +100,8 @@ class LevelBorders(val game:CthulhuGame, val world: World,camera: Camera){
     inner class GetHurtListener(val game: CthulhuGame) : ContactListener {
 
         override fun endContact(contact: Contact?) {
-            //Gdx.app.log("tag","end collision")
-            //var saucer:Saucer? = null
-            //if((contact?.fixtureA?.body?.userData is Saucer) && contact.fixtureB?.body?.userData == "death") {
-                //saucer = contact.fixtureA?.body?.userData as Saucer
-
-            //}
-            //else if((contact?.fixtureB?.body?.userData is Saucer) && contact.fixtureA?.body?.userData == "death") {
-                //saucer = contact.fixtureB?.body?.userData as Saucer
-                //game.getHurt()
-            //}
-            //saucer?.takeDamage(1)
         }
         override fun beginContact(contact: Contact?) {
-            //Gdx.app.log("tag","Begin collision")
             if(contact?.fixtureA?.body?.userData == "death" || contact?.fixtureB?.body?.userData == "death")
                 game.getHurt()
             if(contact?.fixtureA?.body?.userData == "winning" || contact?.fixtureB?.body?.userData == "winning")

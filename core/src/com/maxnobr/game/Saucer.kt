@@ -1,6 +1,7 @@
 package com.maxnobr.game
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.*
@@ -170,5 +171,37 @@ class Saucer(private val game: CthulhuGame) : GameObject {
 
     override fun dispose() {
         atlas?.dispose()
+    }
+
+    override fun save(data: Persistence.GameData){
+        data.playerPosition = body.position
+        data.playerHealth = health
+
+        data.playerInterVec = interVec
+        data.playerInvisibilityBlink = invisibilityBlink
+        data.playerBlinkTimer = blinkTimer
+        data.playerIsBlinking = isBlinking
+        data.playerElapsed_time = elapsed_time
+
+        data.playerBodyIsActive = body.isActive
+        data.playerBodyVelocity = body.linearVelocity
+
+        data.playerIsInvinsible = isInvinsible
+    }
+
+    override fun load(data: Persistence.GameData){
+        body.setTransform(data.playerPosition,0f)
+        health = data.playerHealth
+
+        interVec = data.playerInterVec
+        invisibilityBlink = data.playerInvisibilityBlink
+        blinkTimer = data.playerBlinkTimer
+        isBlinking = data.playerIsBlinking
+        elapsed_time = data.playerElapsed_time
+
+        body.isActive = data.playerBodyIsActive
+        body.linearVelocity = data.playerBodyVelocity
+
+        isInvinsible = data.playerIsInvinsible
     }
 }

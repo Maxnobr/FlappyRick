@@ -13,18 +13,15 @@ import com.codeandweb.physicseditor.PhysicsShapeCache
 import com.maxnobr.game.GameObject
 import java.util.*
 
-class ObstaclePrefab(private var atlas: TextureAtlas,private var physicsBodies: PhysicsShapeCache) : GameObject {
+class ObstaclePrefab(private var atlas: TextureAtlas,private var physicsBodies: PhysicsShapeCache, private var world:World ) {
 
     private var sprites = HashMap<String,Sprite>()
     private var bodies = HashMap<String,ArrayDeque<Body>>()
-    private lateinit var world:World
 
-    val scaleX = 0.7f
-    val scaleY = 0.7f
+    private val scaleX = 0.7f
+    private val scaleY = 0.7f
 
-    override fun create(batch: SpriteBatch, camera: Camera, prmWorld: World) {
-
-        world = prmWorld
+    init {
         sprites["bottomV2"] = Sprite(atlas.findRegion("bottomV2"))
         sprites["topV2"] = Sprite(atlas.findRegion("topV2"))
 
@@ -35,13 +32,6 @@ class ObstaclePrefab(private var atlas: TextureAtlas,private var physicsBodies: 
         }
         bodies["bottomV2"] = ArrayDeque()
         bodies["topV2"] = ArrayDeque()
-    }
-
-    override fun preRender(camera: Camera) {
-
-    }
-
-    override fun render(batch: SpriteBatch, camera: Camera) {
     }
 
     fun draw(str:String,pos: Vector2,body: Body,batch: SpriteBatch,isTop:Boolean) {
@@ -55,7 +45,7 @@ class ObstaclePrefab(private var atlas: TextureAtlas,private var physicsBodies: 
         sprites[str]?.draw(batch)
     }
 
-    fun findBody(name:String) : Body{
+    fun findBody(name:String) : Body {
 
         val result:Body
 
@@ -76,8 +66,5 @@ class ObstaclePrefab(private var atlas: TextureAtlas,private var physicsBodies: 
     fun loseBody(name:String,body: Body) {
         body.isActive = false
         bodies[name]?.add(body)
-    }
-
-    override fun dispose() {
     }
 }

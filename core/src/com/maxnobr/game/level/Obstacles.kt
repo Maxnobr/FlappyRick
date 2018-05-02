@@ -1,6 +1,7 @@
 package com.maxnobr.game.level
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
@@ -8,6 +9,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 import com.codeandweb.physicseditor.PhysicsShapeCache
 import com.maxnobr.game.GameObject
+import com.maxnobr.game.Persistence
 import java.util.*
 
 class Obstacles : GameObject {
@@ -19,15 +21,18 @@ class Obstacles : GameObject {
 
     private var gatePadding = 4f
     private var speed = -.3f
+    private val bottomName = "bottomV2"
+    private val topName = "topV2"
+    private var gap = 7f
 
     private var queue:ArrayDeque<Gate> = ArrayDeque()
 
     override fun create(batch: SpriteBatch, camera: Camera, world: World) {
         atlas = TextureAtlas(Gdx.files.internal("Obstacles.atlas"))
         physicsBodies = PhysicsShapeCache("Obstacles.xml")
-        prefab = ObstaclePrefab(atlas!!,physicsBodies)
-        prefab.create(batch,camera,world)
+        prefab = ObstaclePrefab(atlas!!,physicsBodies,world)
         gatePadding = camera.viewportWidth/3
+        gap = camera.viewportHeight/7
     }
 
     override fun preRender(camera: Camera) {
@@ -37,11 +42,11 @@ class Obstacles : GameObject {
         }
 
         if(queue.isEmpty()) {
-            queue.add(Gate(Vector2(camera.viewportWidth+gatePadding,getNewY(camera.viewportHeight)),prefab))
+            queue.add(Gate(Vector2(camera.viewportWidth+gatePadding,getNewY(camera.viewportHeight)),gap,bottomName,topName,prefab))
         }
         else{
             if (queue.peekLast().pos.x < camera.viewportWidth)
-                queue.add(Gate(Vector2(queue.peekLast().pos.x + gatePadding, getNewY(camera.viewportHeight)), prefab))
+                queue.add(Gate(Vector2(queue.peekLast().pos.x + gatePadding, getNewY(camera.viewportHeight)),gap,bottomName,topName, prefab))
 
             if (queue.peekFirst().pos.x < -20) {
                 queue.peekFirst().dispose()
@@ -66,20 +71,23 @@ class Obstacles : GameObject {
     override fun dispose() {
         atlas?.dispose()
         physicsBodies.dispose()
-        prefab.dispose()
     }
 
+    override fun save(data: Persistence.GameData){
+        data.queue.clear()
+        queue.forEach{ it.save(data) }
+    }
+    override fun load(data: Persistence.GameData){
+        queue.clear()
+        data.queue.forEach {
+            queue.add(Gate(it.pos,it.gap,it.nameBot,it.nameTop,prefab))
+        }
+    }
 
-
-    class Gate(var pos:Vector2, private val prefab: ObstaclePrefab): GameObject {
-
-        private var gap = 7f
+    class Gate(var pos:Vector2,private var gap:Float, private val bottomName:String, private val topName:String, private val prefab: ObstaclePrefab): GameObject {
 
         private var bottomPos = Vector2(0f,0f)
-        private var bottomName = "bottomV2"
-
         private var topPos = Vector2(0f,0f)
-        private var topName = "topV2"
 
         private var bottomBody: Body
         private var topBody: Body
@@ -110,5 +118,10 @@ class Obstacles : GameObject {
             prefab.loseBody(topName,topBody)
         }
 
+        override fun save(data: Persistence.GameData){
+            data.saveGate(pos,gap,bottomName,topName)
+        }
+        override fun load(data: Persistence.GameData){
+        }
     }
 }

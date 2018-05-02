@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.maxnobr.game.CthulhuGame.Companion.GAMEOVER
 import com.maxnobr.game.CthulhuGame.Companion.PAUSE
 import com.maxnobr.game.CthulhuGame.Companion.RUN
+import com.maxnobr.game.CthulhuGame.Companion.SINGLEGAMENAME
 import com.maxnobr.game.CthulhuGame.Companion.START
 import com.maxnobr.game.CthulhuGame.Companion.WINNIG
 import com.maxnobr.game.CthulhuGame.Companion.gameState
@@ -93,9 +94,27 @@ class GUIHelper(var game: CthulhuGame):GameObject {
         title.setAlignment(Align.center)
         stage.addActor(title)
 
+        if(game.fileExists)
+        {
+            // Local Game Button
+            val locButton = TextButton("Continue Game", mySkin, "default")
+            locButton.setSize(col_width, row_height)
+            locButton.setPosition((stage.width-col_width)/2, row_height*3)
+            locButton.label.setAlignment(Align.center)
+            locButton.addListener(object : InputListener() {
+                override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
+                    game.load(SINGLEGAMENAME)
+                    game.changeGameState(RUN)
+                }
+                override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                    return true
+                }
+            })
+            stage.addActor(locButton)
+        }
 
         // Start Button
-        val button = TextButton("Start Game", mySkin, "default")
+        val button = TextButton("New Game", mySkin, "default")
         button.setSize(col_width, row_height)
         button.setPosition((stage.width-col_width)/2, row_height)
         button.label.setAlignment(Align.center)
@@ -254,4 +273,7 @@ class GUIHelper(var game: CthulhuGame):GameObject {
     override fun dispose() {
         stage.dispose()
     }
+
+    override fun save(data: Persistence.GameData){}
+    override fun load(data: Persistence.GameData){}
 }

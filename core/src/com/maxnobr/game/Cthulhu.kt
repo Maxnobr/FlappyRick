@@ -1,6 +1,7 @@
 package com.maxnobr.game
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.Sprite
@@ -33,8 +34,6 @@ class Cthulhu :GameObject{
             sprite.setScale(scaleX,scaleY)
             sprite.setCenter(camera.viewportWidth/5,camera.viewportHeight/4*3)
         }
-
-
     }
 
     override fun preRender(camera: Camera) {
@@ -49,4 +48,7 @@ class Cthulhu :GameObject{
     override fun dispose() {
         atlas.dispose()
     }
+
+    override fun save(data: Persistence.GameData){}
+    override fun load(data: Persistence.GameData){}
 }

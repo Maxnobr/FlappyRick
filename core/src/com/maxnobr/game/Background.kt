@@ -1,6 +1,7 @@
 package com.maxnobr.game
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -75,4 +76,7 @@ class Background : GameObject  {
     override fun dispose() {
         atlas?.dispose()
     }
+
+    override fun save(data: Persistence.GameData){}
+    override fun load(data: Persistence.GameData){}
 }

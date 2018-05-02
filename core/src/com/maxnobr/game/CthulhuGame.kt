@@ -16,6 +16,7 @@ import com.maxnobr.game.level.LevelBorders
 import com.maxnobr.game.level.Obstacles
 
 class CthulhuGame : ApplicationAdapter() {
+
     private lateinit var batch: SpriteBatch
     private var list = LinkedHashMap<String,GameObject>()
     private lateinit var camera: OrthographicCamera
@@ -23,12 +24,23 @@ class CthulhuGame : ApplicationAdapter() {
     var debug = true
     private var readyToJump = true
 
+    var accumulator = 0f
+    private lateinit var world: World
+    private lateinit var debugRenderer: Box2DDebugRenderer
+
+    var fileExists = true
+    private lateinit var persistence: Persistence
+
     companion object {
         const val START = 0
         const val RUN = 1
         const val PAUSE = 2
         const val GAMEOVER = 3
         const val WINNIG = 4
+        const val LOADING = 5
+
+        const val FILE = "files/data.txt"
+        const val SINGLEGAMENAME = "local"
 
         var gameState = -1
 
@@ -36,20 +48,18 @@ class CthulhuGame : ApplicationAdapter() {
         private const val VELOCITY_ITERATIONS = 6
         private const val POSITION_ITERATIONS = 2
     }
-    var accumulator = 0f
-    private lateinit var world: World
-    private lateinit var debugRenderer: Box2DDebugRenderer
 
     override fun create() {
         batch = SpriteBatch()
-
-
+        /*
         val file= Gdx.files.local("files/myFile.txt")
         file.writeString("firstLine\n", false)
         file.writeString("SecondLine",true)
 
         val lines = file.readString().split("\n".toRegex())
         Gdx.app.log("CRUD","loaded message is :'$lines'")
+        */
+        //Gdx.files.local(CthulhuGame.FILE).delete()
 
         Box2D.init()
         world = World(Vector2(0f, -10f), true)
@@ -69,6 +79,8 @@ class CthulhuGame : ApplicationAdapter() {
         list.forEach {it.value.create(batch,camera,world)}
 
         LevelBorders(this,world,camera)
+
+        persistence = Persistence()
 
         changeGameState(START)
     }
@@ -105,25 +117,37 @@ class CthulhuGame : ApplicationAdapter() {
     }
 
     fun changeGameState(state:Int) {
+        while(persistence.processing)
+            Thread.sleep(100)
+        val oldState = gameState
         gameState = state
         when(gameState)
         {
             START -> {
+                fileExists = persistence.hasData
                 introMsc.play()
                 reset()
+                Gdx.app.log("CRUD","file exists : $fileExists")
             }
-            else -> introMsc.stop()
+            PAUSE -> {
+                save(SINGLEGAMENAME)
+            }
+            else -> {
+                introMsc.stop()
+            }
         }
     }
 
     override fun pause() {
         super.pause()
-        if(gameState == RUN) changeGameState(PAUSE)
+        if(gameState == RUN) {
+            changeGameState(PAUSE)
+            save(SINGLEGAMENAME)
+        }
     }
 
     override fun resume() {
         super.resume()
-        //if(gameState == RUN) changeGameState(RUN)
     }
 
     private fun reset() {
@@ -133,7 +157,7 @@ class CthulhuGame : ApplicationAdapter() {
         (list["player"] as Saucer).reset()
     }
 
-    fun getHurt(){
+    fun getHurt() {
         (list["player"] as Saucer).takeDamage(1)
     }
 
@@ -154,5 +178,13 @@ class CthulhuGame : ApplicationAdapter() {
         world.dispose()
         debugRenderer.dispose()
         list.forEach { it.value.dispose() }
+    }
+
+    fun save(saveName:String) {
+        persistence.save(saveName,list)
+    }
+
+    fun load(saveName:String) {
+        persistence.load(saveName,list)
     }
 }
