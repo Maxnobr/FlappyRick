@@ -21,11 +21,11 @@ class Background : GameObject  {
     private var speed1 = -7f
 
     override fun create(batch: SpriteBatch,camera: Camera,world: World) {
-        atlas = TextureAtlas(Gdx.files.internal("Cave.atlas"))
-        bg3 = Sprite(atlas?.findRegions("cave")?.get(1))
-        bg2 = Sprite(atlas?.findRegions("cave")?.get(2))
-        bg1 = Sprite(atlas?.findRegions("cave")?.get(3))
-        bg0 = Sprite(atlas?.findRegions("cave")?.get(0))
+        atlas = TextureAtlas(Gdx.files.internal("TinyCave.atlas"))
+        bg3 = Sprite(atlas?.findRegions("TinyCave")?.get(1))
+        bg2 = Sprite(atlas?.findRegions("TinyCave")?.get(2))
+        bg1 = Sprite(atlas?.findRegions("TinyCave")?.get(3))
+        bg0 = Sprite(atlas?.findRegions("TinyCave")?.get(0))
 
         val scaleX = camera.viewportWidth/bg3.regionWidth.toFloat()
         val scaleY = camera.viewportHeight/bg3.regionHeight.toFloat()

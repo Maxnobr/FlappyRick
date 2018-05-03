@@ -3,7 +3,6 @@ package com.maxnobr.game
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
-import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -76,6 +75,7 @@ class CthulhuGame : ApplicationAdapter() {
         LevelBorders(this,world,camera)
 
         persistence = Persistence()
+        //delete(SINGLEGAMENAME)
 
         changeGameState(START)
     }
@@ -153,7 +153,8 @@ class CthulhuGame : ApplicationAdapter() {
 
     private fun reset() {
         debug = false
-        (list["obstacles"] as Obstacles).reset()
+        if (list.containsKey("obstacles"))
+            (list["obstacles"] as Obstacles).reset()
         (list["player"] as Saucer).setPosition(Vector3(camera.viewportWidth/2,camera.viewportHeight/2,0f))
         (list["player"] as Saucer).reset()
     }

@@ -11,6 +11,10 @@ public class AndroidLauncher extends AndroidApplication {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 
-		initialize(new CthulhuGame(), config);
+		com.badlogic.gdx.ApplicationListener game = new CthulhuGame();
+		initialize(game, config);
 	}
+}
+
+interface GameInterface extends com.badlogic.gdx.ApplicationListener{
 }

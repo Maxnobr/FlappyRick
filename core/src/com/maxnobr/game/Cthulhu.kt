@@ -19,10 +19,10 @@ class Cthulhu :GameObject{
     private var elapsed_time = 0f
 
     private var scaleX = .7f
-    private var scaleY = .7f
+    private var scaleY = .9f
 
     override fun create(batch: SpriteBatch, camera: Camera, world: World) {
-        atlas = TextureAtlas(Gdx.files.internal("Cthulhu.atlas"))
+        atlas = TextureAtlas(Gdx.files.internal("NewNewCthulhu.atlas"))
         // Frames that compose the animation "running"
         val flyingFrames = atlas.findRegions("Cthulhu")
         flyingAnimation = Animation(FRAME_DURATION, flyingFrames, Animation.PlayMode.LOOP)
@@ -30,9 +30,9 @@ class Cthulhu :GameObject{
         val firstTexture = flyingFrames?.first()
         if(firstTexture != null) {
             sprite = Sprite(firstTexture)
-            sprite.setOrigin(0f,0f)
+            sprite.setOrigin(sprite.width/2,sprite.height/2)
             sprite.setScale(scaleX,scaleY)
-            sprite.setCenter(camera.viewportWidth/5,camera.viewportHeight/4*3)
+            sprite.setCenter(-7f,camera.viewportHeight*0.6f)
         }
     }
 

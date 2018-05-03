@@ -29,7 +29,6 @@ class Saucer(private val game: CthulhuGame) : GameObject {
 
     private lateinit var blastSd:Sound
     private lateinit var invinsSd:Music
-    //private var invinsSdID = 0.toLong()
 
     private lateinit var currentFrame: TextureRegion
     private lateinit var sprite: Sprite
@@ -77,7 +76,7 @@ class Saucer(private val game: CthulhuGame) : GameObject {
     fun jump() {
         if(!isInvinsible) {
             body.linearVelocity = Vector2(0f, jump)
-            blastSd.play(.5f)
+            blastSd.play(.3f)
         }
     }
 
@@ -96,7 +95,7 @@ class Saucer(private val game: CthulhuGame) : GameObject {
         blastSd = Gdx.audio.newSound(Gdx.files.internal("257232__javierzumer__retro-shot-blaster.wav"))
         invinsSd = Gdx.audio.newMusic(Gdx.files.internal("328011__astrand__retro-blaster-fire.wav"))
         invinsSd.volume = .4f
-        invinsSd.setLooping(true)
+        invinsSd.isLooping = true
 
         atlas = TextureAtlas(Gdx.files.internal("Saucer.atlas"))
         // Frames that compose the animation "running"
@@ -156,8 +155,6 @@ class Saucer(private val game: CthulhuGame) : GameObject {
                 body.isActive = true
                 body.linearVelocity = Vector2()
                 invinsSd.stop()
-                //invinsSd.play()
-                //invinsSd.setLooping(invinsSdID,false)
             }
         }
 
@@ -189,6 +186,10 @@ class Saucer(private val game: CthulhuGame) : GameObject {
 
         if(CthulhuGame.gameState == CthulhuGame.RUN && health <= 0 && crashAnimation?.isAnimationFinished(elapsed_time)!!)
             game.changeGameState(CthulhuGame.GAMEOVER)
+
+
+        if(invinsSd.isPlaying && CthulhuGame.gameState != CthulhuGame.RUN)
+            invinsSd.stop()
         //batch.draw(currentFrame, originX, originY, width, height)
     }
 

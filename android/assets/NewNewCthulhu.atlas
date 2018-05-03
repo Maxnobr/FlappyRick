@@ -1,0 +1,62 @@
+
+NewNewCthulhu.png
+size: 2048,128
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+Cthulhu
+  rotate: false
+  xy: 2, 2
+  size: 130, 124
+  orig: 130, 124
+  offset: 0, 0
+  index: 0
+Cthulhu
+  rotate: false
+  xy: 134, 2
+  size: 130, 124
+  orig: 130, 124
+  offset: 0, 0
+  index: 1
+Cthulhu
+  rotate: false
+  xy: 266, 2
+  size: 130, 124
+  orig: 130, 124
+  offset: 0, 0
+  index: 2
+Cthulhu
+  rotate: false
+  xy: 398, 2
+  size: 130, 124
+  orig: 130, 124
+  offset: 0, 0
+  index: 3
+Cthulhu
+  rotate: false
+  xy: 530, 2
+  size: 130, 124
+  orig: 130, 124
+  offset: 0, 0
+  index: 4
+Cthulhu
+  rotate: false
+  xy: 662, 2
+  size: 130, 124
+  orig: 130, 124
+  offset: 0, 0
+  index: 5
+Cthulhu
+  rotate: false
+  xy: 794, 2
+  size: 130, 124
+  orig: 130, 124
+  offset: 0, 0
+  index: 6
+Cthulhu
+  rotate: false
+  xy: 926, 2
+  size: 130, 124
+  orig: 130, 124
+  offset: 0, 0
+  index: 7

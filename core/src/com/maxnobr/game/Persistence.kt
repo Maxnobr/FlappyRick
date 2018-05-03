@@ -1,9 +1,7 @@
 package com.maxnobr.game
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.math.Vector2
-import com.maxnobr.game.level.Obstacles
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.concurrent.thread

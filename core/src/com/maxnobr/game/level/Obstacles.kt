@@ -19,11 +19,13 @@ class Obstacles : GameObject {
     private lateinit var prefab:ObstaclePrefab
     private val rnd = Random()
 
-    private var gatePadding = 4f
+    private var gatePadding = 25f
     private var speed = -.3f
     private val bottomName = "bottomV2"
     private val topName = "topV2"
     private var gap = 7f
+
+    //private var screenHeight = 480f
 
     private var queue:ArrayDeque<Gate> = ArrayDeque()
 
@@ -31,8 +33,9 @@ class Obstacles : GameObject {
         atlas = TextureAtlas(Gdx.files.internal("Obstacles.atlas"))
         physicsBodies = PhysicsShapeCache("Obstacles.xml")
         prefab = ObstaclePrefab(atlas!!,physicsBodies,world)
-        gatePadding = camera.viewportWidth/3
-        gap = camera.viewportHeight/7
+        //gatePadding = camera.viewportWidth/3
+        //gap = camera.viewportHeight/gap
+        //screenHeight = camera.viewportHeight
     }
 
     override fun preRender(camera: Camera) {
