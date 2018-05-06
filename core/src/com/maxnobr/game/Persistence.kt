@@ -20,12 +20,23 @@ class Persistence {
                 Gdx.app.log("CRUD",file.readString())
                 val lines = ArrayDeque(file.readString().split("\n".toRegex()))
 
-                val gamesSaved = lines.pollFirst().toInt()
+                var gamesSaved = 0
+                try {
+                    gamesSaved  = lines.pollFirst().toInt()
+                }
+                catch (e : NumberFormatException) { }
                 hasData = gamesSaved > 0
+
                 for(i in 1..gamesSaved){
-                    val data = GameData(lines.pollFirst())
-                    data.read(lines)
-                    saves[data.saveName] = data
+                    var data:GameData? = null
+                    try {
+                        data = GameData(lines.pollFirst())
+                        data.read(lines)
+                        saves[data.saveName] = data
+                    }
+                    catch (e:NumberFormatException) {
+                        Gdx.app.log("CRUD","corrupted data: '${data?.saveName}' not loaded")
+                    }
                 }
                 Gdx.app.log("CRUD","finished reading data !")
                 processing = false

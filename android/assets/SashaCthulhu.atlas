@@ -1,0 +1,202 @@
+
+SashaCthulhu.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+Cthulhu_Arm
+  rotate: false
+  xy: 96, 72
+  size: 72, 50
+  orig: 72, 50
+  offset: 0, 0
+  index: 7
+Cthulhu_Arm
+  rotate: false
+  xy: 289, 228
+  size: 72, 50
+  orig: 72, 50
+  offset: 0, 0
+  index: 0
+Cthulhu_Arm
+  rotate: false
+  xy: 363, 280
+  size: 72, 50
+  orig: 72, 50
+  offset: 0, 0
+  index: 1
+Cthulhu_Arm
+  rotate: false
+  xy: 289, 176
+  size: 72, 50
+  orig: 72, 50
+  offset: 0, 0
+  index: 2
+Cthulhu_Arm
+  rotate: false
+  xy: 363, 228
+  size: 72, 50
+  orig: 72, 50
+  offset: 0, 0
+  index: 3
+Cthulhu_Arm
+  rotate: false
+  xy: 363, 176
+  size: 72, 50
+  orig: 72, 50
+  offset: 0, 0
+  index: 4
+Cthulhu_Arm
+  rotate: false
+  xy: 190, 104
+  size: 72, 50
+  orig: 72, 50
+  offset: 0, 0
+  index: 6
+Cthulhu_Arm
+  rotate: false
+  xy: 170, 52
+  size: 69, 50
+  orig: 69, 50
+  offset: 0, 0
+  index: 5
+Cthulhu_Body
+  rotate: false
+  xy: 284, 437
+  size: 97, 51
+  orig: 97, 51
+  offset: 0, 0
+  index: 0
+Cthulhu_Body
+  rotate: false
+  xy: 284, 384
+  size: 97, 51
+  orig: 97, 51
+  offset: 0, 0
+  index: 1
+Cthulhu_Body
+  rotate: false
+  xy: 383, 437
+  size: 97, 51
+  orig: 97, 51
+  offset: 0, 0
+  index: 2
+Cthulhu_Body
+  rotate: false
+  xy: 383, 384
+  size: 97, 51
+  orig: 97, 51
+  offset: 0, 0
+  index: 3
+Cthulhu_Body
+  rotate: false
+  xy: 190, 315
+  size: 97, 51
+  orig: 97, 51
+  offset: 0, 0
+  index: 4
+Cthulhu_Body
+  rotate: false
+  xy: 190, 262
+  size: 97, 51
+  orig: 97, 51
+  offset: 0, 0
+  index: 5
+Cthulhu_Body
+  rotate: false
+  xy: 190, 209
+  size: 97, 51
+  orig: 97, 51
+  offset: 0, 0
+  index: 6
+Cthulhu_Body
+  rotate: false
+  xy: 190, 156
+  size: 97, 51
+  orig: 97, 51
+  offset: 0, 0
+  index: 7
+Cthulhu_Punch
+  rotate: false
+  xy: 96, 20
+  size: 72, 50
+  orig: 72, 50
+  offset: 0, 0
+  index: 0
+Cthulhu_Punch
+  rotate: false
+  xy: 289, 332
+  size: 72, 50
+  orig: 72, 50
+  offset: 0, 0
+  index: 1
+Cthulhu_Punch
+  rotate: false
+  xy: 289, 280
+  size: 72, 50
+  orig: 72, 50
+  offset: 0, 0
+  index: 2
+Cthulhu_Punch
+  rotate: false
+  xy: 363, 332
+  size: 72, 50
+  orig: 72, 50
+  offset: 0, 0
+  index: 3
+Cthulhu_Wing
+  rotate: false
+  xy: 2, 368
+  size: 92, 120
+  orig: 92, 120
+  offset: 0, 0
+  index: 0
+Cthulhu_Wing
+  rotate: false
+  xy: 2, 246
+  size: 92, 120
+  orig: 92, 120
+  offset: 0, 0
+  index: 1
+Cthulhu_Wing
+  rotate: false
+  xy: 96, 368
+  size: 92, 120
+  orig: 92, 120
+  offset: 0, 0
+  index: 2
+Cthulhu_Wing
+  rotate: false
+  xy: 2, 124
+  size: 92, 120
+  orig: 92, 120
+  offset: 0, 0
+  index: 3
+Cthulhu_Wing
+  rotate: false
+  xy: 96, 246
+  size: 92, 120
+  orig: 92, 120
+  offset: 0, 0
+  index: 4
+Cthulhu_Wing
+  rotate: false
+  xy: 190, 368
+  size: 92, 120
+  orig: 92, 120
+  offset: 0, 0
+  index: 5
+Cthulhu_Wing
+  rotate: false
+  xy: 2, 2
+  size: 92, 120
+  orig: 92, 120
+  offset: 0, 0
+  index: 6
+Cthulhu_Wing
+  rotate: false
+  xy: 96, 124
+  size: 92, 120
+  orig: 92, 120
+  offset: 0, 0
+  index: 7

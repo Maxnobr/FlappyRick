@@ -3,6 +3,7 @@ package com.maxnobr.game
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -14,7 +15,7 @@ import com.badlogic.gdx.physics.box2d.World
 import com.maxnobr.game.level.LevelBorders
 import com.maxnobr.game.level.Obstacles
 
-class CthulhuGame : ApplicationAdapter() {
+class CthulhuGame(var blue:Bluetooth) : ApplicationAdapter() {
 
     private lateinit var batch: SpriteBatch
     private var list = LinkedHashMap<String,GameObject>()
@@ -30,19 +31,21 @@ class CthulhuGame : ApplicationAdapter() {
 
     var fileExists = true
     private lateinit var persistence: Persistence
+    private lateinit var multiPlayer: MultiPlayer
 
     companion object {
         const val START = 0
         const val RUN = 1
         const val PAUSE = 2
         const val GAMEOVER = 3
-        const val WINNIG = 4
+        const val WINNING = 4
         const val LOADING = 5
 
         const val FILE = "files/data.txt"
         const val SINGLEGAMENAME = "local"
 
         var gameState = -1
+        var netState = -1
 
         private const val STEP_TIME = 1f / 60f
         private const val VELOCITY_ITERATIONS = 6
@@ -75,9 +78,12 @@ class CthulhuGame : ApplicationAdapter() {
         LevelBorders(this,world,camera)
 
         persistence = Persistence()
+        multiPlayer = MultiPlayer(this,blue)
         //delete(SINGLEGAMENAME)
 
         changeGameState(START)
+
+        //blue.logBlue("Starting Game !")
     }
 
     override fun render() {
@@ -95,8 +101,10 @@ class CthulhuGame : ApplicationAdapter() {
             stepWorld()
             if(Gdx.input.isTouched){
                 if(readyToJump) {
-                    (list["player"] as Saucer).jump()
                     readyToJump = false
+                    (list["player"] as Saucer).jump()
+                    val vec = camera.unproject(Vector3(Gdx.input.x.toFloat(),Gdx.input.y.toFloat(),0f))
+                    (list["Cthulhu"] as Cthulhu).punch(Vector2(vec.x,vec.y))
                 }
             }
             else
@@ -122,12 +130,12 @@ class CthulhuGame : ApplicationAdapter() {
                 introMsc.play()
                 gameMsc.stop()
                 reset()
-                Gdx.app.log("CRUD","file exists : $fileExists")
+                //Gdx.app.log("CRUD","file exists : $fileExists")
             }
             PAUSE -> {
                 save(SINGLEGAMENAME)
             }
-            WINNIG, GAMEOVER -> {
+            WINNING, GAMEOVER -> {
                 delete(SINGLEGAMENAME)
             }
             else -> {
@@ -192,7 +200,7 @@ class CthulhuGame : ApplicationAdapter() {
         persistence.load(saveName,list)
     }
 
-    fun delete(saveName:String)
+    private fun delete(saveName:String)
     {
         persistence.delete(saveName)
     }

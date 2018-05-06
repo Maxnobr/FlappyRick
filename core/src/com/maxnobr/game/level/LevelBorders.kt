@@ -1,14 +1,11 @@
 package com.maxnobr.game.level
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 import com.badlogic.gdx.physics.box2d.Contact
 import com.badlogic.gdx.physics.box2d.ContactListener
 import com.maxnobr.game.CthulhuGame
-import com.maxnobr.game.Saucer
-import kotlin.experimental.or
 
 
 class LevelBorders(val game:CthulhuGame, val world: World,camera: Camera){
@@ -105,7 +102,7 @@ class LevelBorders(val game:CthulhuGame, val world: World,camera: Camera){
             if(contact?.fixtureA?.body?.userData == "death" || contact?.fixtureB?.body?.userData == "death")
                 game.getHurt()
             if(contact?.fixtureA?.body?.userData == "winning" || contact?.fixtureB?.body?.userData == "winning")
-                game.changeGameState(CthulhuGame.WINNIG)
+                game.changeGameState(CthulhuGame.WINNING)
         }
         override fun preSolve(contact: Contact?, oldManifold: Manifold?) {}
         override fun postSolve(contact: Contact?, impulse: ContactImpulse?) {}

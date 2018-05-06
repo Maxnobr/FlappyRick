@@ -71,6 +71,8 @@ class Saucer(private val game: CthulhuGame) : GameObject {
     fun reset() {
         body.linearVelocity = Vector2()
         health = 4
+        isInvinsible = false
+        stopInvinc()
     }
 
     fun jump() {
@@ -150,11 +152,7 @@ class Saucer(private val game: CthulhuGame) : GameObject {
             }
 
             if(elapsed_time > invisibilityLength) {
-                sprite.setColor(sprite.color.r,sprite.color.g,sprite.color.b,1f)
-                isInvinsible = false
-                body.isActive = true
-                body.linearVelocity = Vector2()
-                invinsSd.stop()
+                stopInvinc()
             }
         }
 
@@ -162,6 +160,14 @@ class Saucer(private val game: CthulhuGame) : GameObject {
             invinsSd.stop()
         sprite.setPosition(body.position.x,body.position.y)
         sprite.rotation = Math.toDegrees(body.angle.toDouble()).toFloat()
+    }
+
+    private fun stopInvinc(){
+        sprite.setColor(sprite.color.r,sprite.color.g,sprite.color.b,1f)
+        isInvinsible = false
+        body.isActive = true
+        body.linearVelocity = Vector2()
+        invinsSd.stop()
     }
 
     override fun render(batch: SpriteBatch,camera:Camera) {

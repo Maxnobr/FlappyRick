@@ -20,7 +20,7 @@ import com.maxnobr.game.CthulhuGame.Companion.PAUSE
 import com.maxnobr.game.CthulhuGame.Companion.RUN
 import com.maxnobr.game.CthulhuGame.Companion.SINGLEGAMENAME
 import com.maxnobr.game.CthulhuGame.Companion.START
-import com.maxnobr.game.CthulhuGame.Companion.WINNIG
+import com.maxnobr.game.CthulhuGame.Companion.WINNING
 import com.maxnobr.game.CthulhuGame.Companion.gameState
 
 
@@ -63,7 +63,7 @@ class GUIHelper(var game: CthulhuGame):GameObject {
                 if(screenState != gameState) getLostScreen()
                 Gdx.gl.glClearColor(1f, 1f, 1f, .5f)
             }
-            WINNIG ->{
+            WINNING ->{
                 if(screenState != gameState) getWonScreen()
                 Gdx.gl.glClearColor(1f, 1f, 1f, .5f)
             }
@@ -105,6 +105,26 @@ class GUIHelper(var game: CthulhuGame):GameObject {
                 override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
                     game.load(SINGLEGAMENAME)
                     game.changeGameState(RUN)
+                }
+                override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                    return true
+                }
+            })
+            stage.addActor(locButton)
+        }
+
+        if(game.blue.canBlue())
+        {
+            // MultiPlayer Game Button
+            val locButton = TextButton("Multi Game", mySkin, "default")
+            locButton.setSize(col_width, row_height)
+            locButton.setPosition((stage.width-col_width)/2, row_height*2)
+            locButton.label.setAlignment(Align.center)
+            locButton.addListener(object : InputListener() {
+                override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
+                    //game.load(SINGLEGAMENAME)
+                    //game.changeGameState(RUN)
+                    game.blue.receiveBtn(1)
                 }
                 override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                     return true
