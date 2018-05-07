@@ -124,13 +124,30 @@ class GUIHelper(var game: CthulhuGame):GameObject {
                 override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
                     //game.load(SINGLEGAMENAME)
                     //game.changeGameState(RUN)
-                    game.blue.receiveBtn(1)
+                    game.blue.receiveBtn(2)
                 }
                 override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                     return true
                 }
             })
             stage.addActor(locButton)
+
+            // Discover Game Button
+            val discButton = TextButton("Discoverable", mySkin, "default")
+            discButton.setSize(col_width, row_height)
+            discButton.setPosition((stage.width-col_width)/2+col_width, row_height*2)
+            discButton.label.setAlignment(Align.center)
+            discButton.addListener(object : InputListener() {
+                override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
+                    //game.load(SINGLEGAMENAME)
+                    //game.changeGameState(RUN)
+                    game.blue.receiveBtn(3)
+                }
+                override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                    return true
+                }
+            })
+            stage.addActor(discButton)
         }
 
         // Start Button

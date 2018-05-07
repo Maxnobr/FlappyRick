@@ -1,0 +1,258 @@
+
+NewSaucer.png
+size: 512,64
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+Nose
+  rotate: false
+  xy: 173, 13
+  size: 7, 10
+  orig: 7, 10
+  offset: 0, 0
+  index: -1
+Rings
+  rotate: false
+  xy: 2, 13
+  size: 21, 9
+  orig: 21, 9
+  offset: 0, 0
+  index: 0
+Rings
+  rotate: false
+  xy: 477, 48
+  size: 21, 9
+  orig: 21, 9
+  offset: 0, 0
+  index: 1
+Rings
+  rotate: false
+  xy: 2, 2
+  size: 21, 9
+  orig: 21, 9
+  offset: 0, 0
+  index: 2
+Saucer
+  rotate: false
+  xy: 2, 24
+  size: 31, 33
+  orig: 31, 33
+  offset: 0, 0
+  index: -1
+SaucerCrash
+  rotate: false
+  xy: 35, 25
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 10
+SaucerCrash
+  rotate: false
+  xy: 69, 25
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 11
+SaucerCrash
+  rotate: false
+  xy: 103, 25
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 12
+SaucerCrash
+  rotate: false
+  xy: 137, 25
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 13
+SaucerCrash
+  rotate: false
+  xy: 171, 25
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 0
+SaucerCrash
+  rotate: false
+  xy: 205, 25
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 1
+SaucerCrash
+  rotate: false
+  xy: 239, 25
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 2
+SaucerCrash
+  rotate: false
+  xy: 273, 25
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 3
+SaucerCrash
+  rotate: false
+  xy: 307, 25
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 4
+SaucerCrash
+  rotate: false
+  xy: 341, 25
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 6
+SaucerCrash
+  rotate: false
+  xy: 375, 25
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 7
+SaucerCrash
+  rotate: false
+  xy: 409, 25
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 8
+SaucerCrash
+  rotate: false
+  xy: 443, 25
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: 9
+SaucerDam1
+  rotate: false
+  xy: 477, 28
+  size: 7, 18
+  orig: 7, 18
+  offset: 0, 0
+  index: 1
+SaucerDam1
+  rotate: false
+  xy: 486, 28
+  size: 7, 18
+  orig: 7, 18
+  offset: 0, 0
+  index: 5
+SaucerDam1
+  rotate: false
+  xy: 93, 6
+  size: 7, 17
+  orig: 7, 17
+  offset: 0, 0
+  index: 2
+SaucerDam1
+  rotate: false
+  xy: 111, 6
+  size: 7, 17
+  orig: 7, 17
+  offset: 0, 0
+  index: 4
+SaucerDam1
+  rotate: false
+  xy: 129, 7
+  size: 7, 16
+  orig: 7, 16
+  offset: 0, 0
+  index: 3
+SaucerDam1
+  rotate: false
+  xy: 157, 8
+  size: 6, 15
+  orig: 6, 15
+  offset: 0, 0
+  index: 0
+SaucerDam2
+  rotate: false
+  xy: 75, 6
+  size: 7, 17
+  orig: 7, 17
+  offset: 0, 0
+  index: 2
+SaucerDam2
+  rotate: false
+  xy: 84, 6
+  size: 7, 17
+  orig: 7, 17
+  offset: 0, 0
+  index: 4
+SaucerDam2
+  rotate: false
+  xy: 102, 5
+  size: 7, 18
+  orig: 7, 18
+  offset: 0, 0
+  index: 1
+SaucerDam2
+  rotate: false
+  xy: 120, 6
+  size: 7, 17
+  orig: 7, 17
+  offset: 0, 0
+  index: 5
+SaucerDam2
+  rotate: false
+  xy: 138, 7
+  size: 7, 16
+  orig: 7, 16
+  offset: 0, 0
+  index: 3
+SaucerDam2
+  rotate: false
+  xy: 165, 8
+  size: 6, 15
+  orig: 6, 15
+  offset: 0, 0
+  index: 0
+SaucerDam3
+  rotate: false
+  xy: 25, 4
+  size: 8, 18
+  orig: 8, 18
+  offset: 0, 0
+  index: 1
+SaucerDam3
+  rotate: false
+  xy: 35, 6
+  size: 8, 17
+  orig: 8, 17
+  offset: 0, 0
+  index: 5
+SaucerDam3
+  rotate: false
+  xy: 45, 6
+  size: 8, 17
+  orig: 8, 17
+  offset: 0, 0
+  index: 4
+SaucerDam3
+  rotate: false
+  xy: 55, 6
+  size: 8, 17
+  orig: 8, 17
+  offset: 0, 0
+  index: 6
+SaucerDam3
+  rotate: false
+  xy: 65, 6
+  size: 8, 17
+  orig: 8, 17
+  offset: 0, 0
+  index: 3
+SaucerDam3
+  rotate: false
+  xy: 147, 8
+  size: 8, 15
+  orig: 8, 15
+  offset: 0, 0
+  index: 0

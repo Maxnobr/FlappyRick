@@ -18,10 +18,16 @@ public class AndroidLauncher extends AndroidApplication {
 		blue = new AndroidBluetooth(this);
         CthulhuGame game = new CthulhuGame(blue);
 		initialize(game, config);
+
+        blue.onCreate();
 	}
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        blue.onActivityResult(requestCode,resultCode,data);
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        blue.logBlue("onActivityResult in launcher req: "+requestCode+" result: "+resultCode+" data: "+data);
+        //if(data != null)
+            blue.onActivityResult(requestCode,resultCode,data);
+        //else
+        //    blue.logBlue("no DATA onActivityResult in launcher");
     }
 
     @Override

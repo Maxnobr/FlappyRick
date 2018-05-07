@@ -26,6 +26,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.badlogic.gdx.Gdx;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,7 +41,7 @@ import java.util.UUID;
  */
 public class BluetoothChatService {
     // Debugging
-    private static final String TAG = "BluetoothChatService";
+    private static final String TAG = "androidTag";
 
     // Name for the SDP record when creating server socket
     private static final String NAME_SECURE = "BluetoothChatSecure";
@@ -73,6 +75,7 @@ public class BluetoothChatService {
      * @param handler A Handler to send messages back to the UI Activity
      */
     public BluetoothChatService(Handler handler) {
+        Gdx.app.log(TAG, "BluetoothChatService init");
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
         mNewState = mState;
@@ -85,7 +88,7 @@ public class BluetoothChatService {
     private synchronized void updateUserInterfaceTitle() {
         mState = getState();
         //Log.d(TAG, "updateUserInterfaceTitle() " + mNewState + " -> " + mState);
-        Log.i(TAG, "updateUserInterfaceTitle() " + mNewState + " -> " + mState);
+        Gdx.app.log(TAG, "updateUserInterfaceTitle() " + mNewState + " -> " + mState);
         mNewState = mState;
 
         // Give the new state to the Handler so the UI Activity can update
@@ -104,7 +107,9 @@ public class BluetoothChatService {
      * session in listening (server) mode. Called by the Activity onResume()
      */
     public synchronized void start() {
-        Log.d(TAG, "start");
+        //Log.d(TAG, "start");
+        Gdx.app.log(TAG, "start");
+
 
         // Cancel any thread attempting to make a connection
         if (mConnectThread != null) {
@@ -138,7 +143,9 @@ public class BluetoothChatService {
      * @param secure Socket Security type - Secure (true) , Insecure (false)
      */
     public synchronized void connect(BluetoothDevice device, boolean secure) {
-        Log.d(TAG, "connect to: " + device);
+        //Log.d(TAG, "connect to: " + device);
+        Gdx.app.log(TAG, "connect to: " + device);
+
 
         // Cancel any thread attempting to make a connection
         if (mState == STATE_CONNECTING) {
@@ -169,7 +176,9 @@ public class BluetoothChatService {
      */
     public synchronized void connected(BluetoothSocket socket, BluetoothDevice
             device, final String socketType) {
-        Log.d(TAG, "connected, Socket Type:" + socketType);
+        //Log.d(TAG, "connected, Socket Type:" + socketType);
+        Gdx.app.log(TAG, "connected, Socket Type:" + socketType);
+
 
         // Cancel the thread that completed the connection
         if (mConnectThread != null) {
@@ -211,7 +220,9 @@ public class BluetoothChatService {
      * Stop all threads
      */
     public synchronized void stop() {
-        Log.d(TAG, "stop");
+
+        //Log.d(TAG, "stop");
+        Gdx.app.log(TAG, "stop");
 
         if (mConnectThread != null) {
             mConnectThread.cancel();
@@ -317,14 +328,17 @@ public class BluetoothChatService {
                             NAME_INSECURE, MY_UUID_INSECURE);
                 }
             } catch (IOException e) {
-                Log.e(TAG, "Socket Type: " + mSocketType + "listen() failed", e);
+                //Log.e(TAG, "Socket Type: " + mSocketType + "listen() failed", e);
+                Gdx.app.log(TAG, "Socket Type: " + mSocketType + "listen() failed", e);
             }
             mmServerSocket = tmp;
             mState = STATE_LISTEN;
         }
 
         public void run() {
-            Log.d(TAG, "Socket Type: " + mSocketType +
+            //Log.d(TAG, "Socket Type: " + mSocketType +
+            //        "BEGIN mAcceptThread" + this);
+            Gdx.app.log(TAG, "Socket Type: " + mSocketType +
                     "BEGIN mAcceptThread" + this);
             setName("AcceptThread" + mSocketType);
 
@@ -337,7 +351,8 @@ public class BluetoothChatService {
                     // successful connection or an exception
                     socket = mmServerSocket.accept();
                 } catch (IOException e) {
-                    Log.e(TAG, "Socket Type: " + mSocketType + "accept() failed", e);
+                    //Log.e(TAG, "Socket Type: " + mSocketType + "accept() failed", e);
+                    Gdx.app.log(TAG, "Socket Type: " + mSocketType + "accept() failed", e);
                     break;
                 }
 
@@ -357,15 +372,16 @@ public class BluetoothChatService {
                                 try {
                                     socket.close();
                                 } catch (IOException e) {
-                                    Log.e(TAG, "Could not close unwanted socket", e);
+                                    //Log.e(TAG, "Could not close unwanted socket", e);
+                                    Gdx.app.log(TAG, "Could not close unwanted socket", e);
                                 }
                                 break;
                         }
                     }
                 }
             }
-            Log.i(TAG, "END mAcceptThread, socket Type: " + mSocketType);
-
+            //Log.i(TAG, "END mAcceptThread, socket Type: " + mSocketType);
+            Gdx.app.log(TAG, "END mAcceptThread, socket Type: " + mSocketType);
         }
 
         public void cancel() {
@@ -373,7 +389,8 @@ public class BluetoothChatService {
             try {
                 mmServerSocket.close();
             } catch (IOException e) {
-                Log.e(TAG, "Socket Type" + mSocketType + "close() of server failed", e);
+                //Log.e(TAG, "Socket Type" + mSocketType + "close() of server failed", e);
+                Gdx.app.log(TAG, "Socket Type" + mSocketType + "close() of server failed", e);
             }
         }
     }
@@ -404,14 +421,16 @@ public class BluetoothChatService {
                             MY_UUID_INSECURE);
                 }
             } catch (IOException e) {
-                Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
+                //Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
+                Gdx.app.log(TAG, "Socket Type: " + mSocketType + "create() failed", e);
             }
             mmSocket = tmp;
             mState = STATE_CONNECTING;
         }
 
         public void run() {
-            Log.i(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
+            //Log.i(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
+            Gdx.app.log(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
             setName("ConnectThread" + mSocketType);
 
             // Always cancel discovery because it will slow down a connection
@@ -427,7 +446,9 @@ public class BluetoothChatService {
                 try {
                     mmSocket.close();
                 } catch (IOException e2) {
-                    Log.e(TAG, "unable to close() " + mSocketType +
+                    //Log.e(TAG, "unable to close() " + mSocketType +
+                    //        " socket during connection failure", e2);
+                    Gdx.app.log(TAG, "unable to close() " + mSocketType +
                             " socket during connection failure", e2);
                 }
                 connectionFailed();
@@ -447,7 +468,8 @@ public class BluetoothChatService {
             try {
                 mmSocket.close();
             } catch (IOException e) {
-                Log.e(TAG, "close() of connect " + mSocketType + " socket failed", e);
+                //Log.e(TAG, "close() of connect " + mSocketType + " socket failed", e);
+                Gdx.app.log(TAG, "close() of connect " + mSocketType + " socket failed", e);
             }
         }
     }
@@ -462,7 +484,8 @@ public class BluetoothChatService {
         private final OutputStream mmOutStream;
 
         public ConnectedThread(BluetoothSocket socket, String socketType) {
-            Log.d(TAG, "create ConnectedThread: " + socketType);
+            //Log.d(TAG, "create ConnectedThread: " + socketType);
+            Gdx.app.log(TAG, "create ConnectedThread: " + socketType);
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
@@ -472,7 +495,8 @@ public class BluetoothChatService {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
             } catch (IOException e) {
-                Log.e(TAG, "temp sockets not created", e);
+                //Log.e(TAG, "temp sockets not created", e);
+                Gdx.app.log(TAG, "temp sockets not created", e);
             }
 
             mmInStream = tmpIn;
@@ -481,7 +505,8 @@ public class BluetoothChatService {
         }
 
         public void run() {
-            Log.i(TAG, "BEGIN mConnectedThread");
+            //Log.i(TAG, "BEGIN mConnectedThread");
+            Gdx.app.log(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
             int bytes;
 
@@ -495,7 +520,8 @@ public class BluetoothChatService {
                     mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
                 } catch (IOException e) {
-                    Log.e(TAG, "disconnected", e);
+                    //Log.e(TAG, "disconnected", e);
+                    Gdx.app.log(TAG, "disconnected", e);
                     connectionLost();
                     break;
                 }
@@ -515,7 +541,8 @@ public class BluetoothChatService {
                 mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer)
                         .sendToTarget();
             } catch (IOException e) {
-                Log.e(TAG, "Exception during write", e);
+                //Log.e(TAG, "Exception during write", e);
+                Gdx.app.log(TAG, "Exception during write", e);
             }
         }
 
@@ -523,7 +550,8 @@ public class BluetoothChatService {
             try {
                 mmSocket.close();
             } catch (IOException e) {
-                Log.e(TAG, "close() of connect socket failed", e);
+                //Log.e(TAG, "close() of connect socket failed", e);
+                Gdx.app.log(TAG, "close() of connect socket failed", e);
             }
         }
     }

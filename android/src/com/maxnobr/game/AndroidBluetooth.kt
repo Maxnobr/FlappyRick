@@ -12,6 +12,7 @@ class AndroidBluetooth(private var activity:Activity) : Bluetooth{
     private val REQUEST_CONNECT_DEVICE_SECURE = 1
     private val REQUEST_CONNECT_DEVICE_INSECURE = 2
     private val REQUEST_ENABLE_BT = 3
+    private val REQUEST_DURATION = 100
 
     private var player:MultiPlayer? = null
 
@@ -32,13 +33,24 @@ class AndroidBluetooth(private var activity:Activity) : Bluetooth{
         return mBluetoothAdapter != null
     }
 
-    fun onStart() {
+    fun onCreate(){
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-        if (mBluetoothAdapter == null) {
+        if (mBluetoothAdapter == null)
             logBlue("there is no BluetoothAdapter")
-        }
         else
             logBlue("BluetoothAdapter Found !")
+    }
+
+    fun onStart() {
+        // If BT is not on, request that it be enabled.
+        // setupChat() will then be called during onActivityResult
+        if (mBluetoothAdapter != null && !mBluetoothAdapter!!.isEnabled) {
+            val enableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            activity.startActivityForResult(enableIntent, REQUEST_ENABLE_BT)
+            // Otherwise, setup the chat session
+        } else if (mChatService == null) {
+            setupChat()
+        }
     }
 
     fun onDestroy() {
@@ -63,8 +75,8 @@ class AndroidBluetooth(private var activity:Activity) : Bluetooth{
         logBlue("discoverable !")
         if (mBluetoothAdapter?.scanMode != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
             val discoverableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE)
-            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 30)
-            activity.startActivity(discoverableIntent)
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, REQUEST_DURATION)
+            activity.startActivityForResult(discoverableIntent,REQUEST_ENABLE_BT)
         }
     }
 
@@ -125,18 +137,20 @@ class AndroidBluetooth(private var activity:Activity) : Bluetooth{
         true
     }
 
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        logBlue("onActivityResult!")
+        logBlue("onActivityResult in launcher req: $requestCode result: $resultCode data: $data")
         when (requestCode) {
             REQUEST_CONNECT_DEVICE_SECURE ->
-                if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == Activity.RESULT_OK && data != null) {
                     connectDevice(data, true)
                 }
             REQUEST_CONNECT_DEVICE_INSECURE ->
-                if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == Activity.RESULT_OK  && data != null) {
                     connectDevice(data, false)
                 }
             REQUEST_ENABLE_BT ->
-                if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == REQUEST_DURATION) {
                     setupChat()
                 } else {
                     // User did not enable Bluetooth or an error occurred
