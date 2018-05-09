@@ -51,7 +51,11 @@ class ObstaclePrefab(private var atlas: TextureAtlas,private var physicsBodies: 
 
         if(bodies[name]!!.isEmpty()) {
             result = physicsBodies.createBody(name, world, sprites[name]!!.scaleX, sprites[name]!!.scaleY)
-            result.fixtureList.forEach { it.filterData.categoryBits = LevelBorders.CATEGORY_LEVEL; it.filterData.maskBits = LevelBorders.MASK_LEVEL}
+            //result.fixtureList.forEach { it.filterData.categoryBits = LevelBorders.CATEGORY_LEVEL; it.filterData.maskBits = LevelBorders.MASK_LEVEL}
+            //no nested iterators ?
+            result.fixtureList[0].filterData.categoryBits = LevelBorders.CATEGORY_LEVEL
+            result.fixtureList[0].filterData.maskBits = LevelBorders.MASK_LEVEL
+
             result.userData = "obstacle"
             result.type = BodyDef.BodyType.KinematicBody
             result.setTransform(sprites[name]!!.originX, sprites[name]!!.originY, sprites[name]!!.rotation)

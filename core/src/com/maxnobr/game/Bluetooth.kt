@@ -7,4 +7,5 @@ interface Bluetooth {
     fun canBlue():Boolean
     fun sendMessage(message: String)
     fun receiveBtn(id : Int)
+    fun stop()
 }

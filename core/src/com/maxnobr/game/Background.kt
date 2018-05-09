@@ -85,4 +85,6 @@ class Background : GameObject  {
 
     override fun save(data: Persistence.GameData){}
     override fun load(data: Persistence.GameData){}
+    override fun send(mPlayer: MultiPlayer){}
+    override fun receive(msg: String){}
 }

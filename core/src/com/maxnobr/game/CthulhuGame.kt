@@ -3,7 +3,6 @@ package com.maxnobr.game
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -14,6 +13,8 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.maxnobr.game.level.LevelBorders
 import com.maxnobr.game.level.Obstacles
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match
+import java.util.*
 
 class CthulhuGame(var blue:Bluetooth) : ApplicationAdapter() {
 
@@ -23,33 +24,50 @@ class CthulhuGame(var blue:Bluetooth) : ApplicationAdapter() {
     private lateinit var introMsc:Music
     private lateinit var gameMsc:Music
     var debug = true
-    private var readyToJump = true
+    private var readyToTap = true
 
     var accumulator = 0f
     private lateinit var world: World
     private lateinit var debugRenderer: Box2DDebugRenderer
 
-    var fileExists = true
-    private lateinit var persistence: Persistence
-    private lateinit var multiPlayer: MultiPlayer
+    lateinit var persistence: Persistence
+    lateinit var multiPlayer: MultiPlayer
 
     companion object {
         const val START = 0
         const val RUN = 1
-        const val PAUSE = 2
-        const val GAMEOVER = 3
-        const val WINNING = 4
-        const val LOADING = 5
+        const val WAITINGONRUN = 2
+        const val PAUSE = 3
+        const val GAMEOVER = 4
+        const val WINNING = 5
+
 
         const val FILE = "files/data.txt"
         const val SINGLEGAMENAME = "local"
 
+        var saveName = SINGLEGAMENAME
         var gameState = -1
-        var netState = -1
+
+        const val ISPLAYER = 1
+        const val ISMONSTER = 2
+
+        var gamer = ISPLAYER
 
         private const val STEP_TIME = 1f / 60f
         private const val VELOCITY_ITERATIONS = 6
         private const val POSITION_ITERATIONS = 2
+
+        const val BACKGROUND = "background"
+        const val OBSTACLES = "obstacles"
+        const val PLAYER = "player"
+        const val CTHULHU = "Cthulhu"
+        const val GUI = "gui"
+
+        const val CODE_CHANGESTATE = 0
+
+        private var fromMulti = false
+        var flipper = true
+        var flipper2 = true
     }
 
     override fun create() {
@@ -68,11 +86,11 @@ class CthulhuGame(var blue:Bluetooth) : ApplicationAdapter() {
         camera = OrthographicCamera()
         camera.setToOrtho(false,80F,48F)
 
-        list["background"] = Background()
-        list["obstacles"] = Obstacles()
-        list["player"] = Saucer(this)
-        list["Cthulhu"] = Cthulhu()
-        list["gui"] = GUIHelper(this)
+        list[BACKGROUND] = Background()
+        list[OBSTACLES] = Obstacles(this)
+        list[PLAYER] = Saucer(this)
+        list[CTHULHU] = Cthulhu(this)
+        list[GUI] = GUIHelper(this)
         list.forEach {it.value.create(batch,camera,world)}
 
         LevelBorders(this,world,camera)
@@ -92,23 +110,31 @@ class CthulhuGame(var blue:Bluetooth) : ApplicationAdapter() {
         Gdx.gl.glClearColor(0.57f, 0.77f, 0.85f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        if(gameState == RUN) list.forEach { it.value.preRender(camera) }
+        if(gameState == RUN) list.forEach { it.value.preRender(camera)
+            it.value.send(multiPlayer)}
         batch.begin()
-        list.forEach { if(it.key != "gui")it.value.render(batch,camera) }
+        list.forEach { if(it.key != GUI) it.value.render(batch,camera)}
         batch.end()
 
         if(gameState == RUN) {
             stepWorld()
+            if((Math.abs(Gdx.input.accelerometerX)+Math.abs(Gdx.input.accelerometerY)+Math.abs(Gdx.input.accelerometerZ)) > 60)
+                changeGameState(PAUSE)
+            //Gdx.app.log("NOW","${Math.abs(Gdx.input.accelerometerX)+Math.abs(Gdx.input.accelerometerY)+Math.abs(Gdx.input.accelerometerZ)}")
             if(Gdx.input.isTouched){
-                if(readyToJump) {
-                    readyToJump = false
-                    (list["player"] as Saucer).jump()
-                    val vec = camera.unproject(Vector3(Gdx.input.x.toFloat(),Gdx.input.y.toFloat(),0f))
-                    (list["Cthulhu"] as Cthulhu).punch(Vector2(vec.x,vec.y))
+                if(readyToTap) {
+                    readyToTap = false
+                    when(gamer){
+                        ISPLAYER -> (list[PLAYER] as Saucer).jump()
+                        ISMONSTER -> {
+                            val vec = camera.unproject(Vector3(Gdx.input.x.toFloat(),Gdx.input.y.toFloat(),0f))
+                            (list[CTHULHU] as Cthulhu).punch(Vector2(vec.x,vec.y))
+                        }
+                    }
                 }
             }
             else
-                readyToJump = true
+                readyToTap = true
         }
         if(debug) {
             Gdx.gl.glClearColor(0f,0f,0f,1f)
@@ -116,42 +142,42 @@ class CthulhuGame(var blue:Bluetooth) : ApplicationAdapter() {
             debugRenderer.render(world, camera.combined)
         }
 
-        list["gui"]?.render(batch,camera)
+        list[GUI]?.render(batch,camera)
     }
 
     fun changeGameState(state:Int) {
+
         while(persistence.processing)
             Thread.sleep(100)
-        val oldState = gameState
         gameState = state
-        when(gameState)
-        {
+        if(!fromMulti)
+            multiPlayer.send(MultiPlayer.GAME,"$CODE_CHANGESTATE $gameState")
+        fromMulti = false
+        when(gameState) {
             START -> {
                 introMsc.play()
                 gameMsc.stop()
                 reset()
-                //Gdx.app.log("CRUD","file exists : $fileExists")
             }
-            PAUSE -> {
-                save(SINGLEGAMENAME)
-            }
-            WINNING, GAMEOVER -> {
-                delete(SINGLEGAMENAME)
-            }
-            else -> {
+            RUN->{
                 gameMsc.play()
                 introMsc.stop()
             }
+            PAUSE -> {
+                //Gdx.input.vibrate(longArrayOf(10,50,10,50),-1)
+                save(saveName)
+            }
+            WINNING, GAMEOVER -> {
+                delete(saveName)
+            }
         }
-        fileExists = persistence.hasData
-
     }
 
     override fun pause() {
         super.pause()
         if(gameState == RUN) {
             changeGameState(PAUSE)
-            save(SINGLEGAMENAME)
+            save(saveName)
         }
     }
 
@@ -161,14 +187,14 @@ class CthulhuGame(var blue:Bluetooth) : ApplicationAdapter() {
 
     private fun reset() {
         debug = false
-        if (list.containsKey("obstacles"))
-            (list["obstacles"] as Obstacles).reset()
-        (list["player"] as Saucer).setPosition(Vector3(camera.viewportWidth/2,camera.viewportHeight/2,0f))
-        (list["player"] as Saucer).reset()
+        if (list.containsKey(OBSTACLES))
+            (list[OBSTACLES] as Obstacles).reset()
+        (list[PLAYER] as Saucer).setPosition(Vector3(camera.viewportWidth/2,camera.viewportHeight/2,0f))
+        (list[PLAYER] as Saucer).reset()
     }
 
     fun getHurt() {
-        (list["player"] as Saucer).takeDamage(1)
+        (list[PLAYER] as Saucer).takeDamage(1,false)
     }
 
     private fun stepWorld() {
@@ -193,15 +219,28 @@ class CthulhuGame(var blue:Bluetooth) : ApplicationAdapter() {
     }
 
     fun save(saveName:String) {
-        persistence.save(saveName,list)
+        if(gamer == ISPLAYER)
+            persistence.save(saveName,list)
     }
 
     fun load(saveName:String) {
         persistence.load(saveName,list)
     }
 
-    private fun delete(saveName:String)
-    {
+    private fun delete(saveName:String) {
         persistence.delete(saveName)
+    }
+
+    fun receive(toWhom:String,msg:String) {
+        list[toWhom]?.receive(msg)
+    }
+
+    fun receive(msg:String) {
+        val words = ArrayDeque(msg.split(" ".toRegex()))
+        when(words.pollFirst().toInt()){
+            CODE_CHANGESTATE -> {
+                fromMulti = true
+                changeGameState(words.pollFirst().toInt())}
+        }
     }
 }

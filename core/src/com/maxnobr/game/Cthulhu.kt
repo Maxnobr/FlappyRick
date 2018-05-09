@@ -8,9 +8,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.BodyDef
+import com.badlogic.gdx.physics.box2d.FixtureDef
+import com.badlogic.gdx.physics.box2d.PolygonShape
 import com.badlogic.gdx.physics.box2d.World
+import com.maxnobr.game.level.LevelBorders
+import java.util.*
 
-class Cthulhu :GameObject{
+class Cthulhu(private var game: CthulhuGame) :GameObject{
+
     private val FRAME_DURATION = .19f//.19f
     private val PUNCH_DURATION = .4f
     private lateinit var atlas: TextureAtlas
@@ -76,6 +82,24 @@ class Cthulhu :GameObject{
         punchSprite = Sprite(punchFrames?.first())
         punchSprite.setScale(scaleX,scaleY)
         punchSprite.setOrigin(22f,43f)
+
+        //physics body
+        val punchBodyDef = BodyDef()
+        punchBodyDef.position.set(Vector2(target.x, target.y))
+        val punchBody = world.createBody(punchBodyDef)
+
+        val punchBox = PolygonShape()
+        punchBox.setAsBox(camera.viewportWidth, 1f)
+
+        val ceilingFixDef = FixtureDef()
+        ceilingFixDef.shape = punchBox
+        ceilingFixDef.filter.categoryBits = LevelBorders.CATEGORY_TRIGGERS
+        ceilingFixDef.filter.maskBits = LevelBorders.MASK_TRIGGERS
+
+        punchBody.createFixture(ceilingFixDef)
+        punchBody.userData = "death"
+        punchBox.dispose()
+        punchBody.isActive = false
     }
 
     override fun preRender(camera: Camera) {
@@ -139,7 +163,7 @@ class Cthulhu :GameObject{
         wingSprite.draw(batch)
     }
 
-    fun punch(pos:Vector2){
+    @Synchronized fun punch(pos:Vector2){
         //val x = pos.angle(Vector2(0f,-1f))
         target = pos
         val angle = Vector2(pos.x - armpos.x, pos.y - armpos.y).angle()
@@ -155,6 +179,8 @@ class Cthulhu :GameObject{
             aimPunch()
             punch_time = 0f
         }
+        if(CthulhuGame.gamer == CthulhuGame.ISMONSTER)
+            game.multiPlayer.send(MultiPlayer.CTHULHU,"${pos.x} ${pos.y}")
     }
 
     private fun aimPunch() {
@@ -170,4 +196,12 @@ class Cthulhu :GameObject{
 
     override fun save(data: Persistence.GameData){}
     override fun load(data: Persistence.GameData){}
+    override fun send(mPlayer: MultiPlayer) {}
+    override fun receive(msg: String) {
+        if(CthulhuGame.gamer == CthulhuGame.ISPLAYER)
+        {
+            val words = ArrayDeque(msg.split(" ".toRegex()))
+            punch(Vector2(words.pollFirst().toFloat(),words.pollFirst().toFloat()))
+        }
+    }
 }

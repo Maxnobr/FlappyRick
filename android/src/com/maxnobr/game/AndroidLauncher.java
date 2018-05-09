@@ -18,7 +18,6 @@ public class AndroidLauncher extends AndroidApplication {
 		blue = new AndroidBluetooth(this);
         CthulhuGame game = new CthulhuGame(blue);
 		initialize(game, config);
-
         blue.onCreate();
 	}
 

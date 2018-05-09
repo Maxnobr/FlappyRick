@@ -29,6 +29,7 @@ class GUIHelper(var game: CthulhuGame):GameObject {
     private lateinit var mySkin:Skin
     private lateinit var splashScreen: Texture
     private var screenState = -1
+    private var updateScreen = false
 
     //private var scaleX = 1f
     //private var scaleY = 1f
@@ -49,26 +50,27 @@ class GUIHelper(var game: CthulhuGame):GameObject {
 
     override fun render(batch: SpriteBatch, camera: Camera) {
 
+        updateScreen = screenState != gameState
         when(gameState) {
             START -> {
-                if(screenState != gameState) getStartScreen()
+                if(updateScreen) getStartScreen()
                 Gdx.gl.glClearColor(.3f, .8f, .3f, 1f)
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
             }
             PAUSE ->{
-                if(screenState != gameState) getPauseScreen()
+                if(updateScreen) getPauseScreen()
                 Gdx.gl.glClearColor(1f, 1f, 1f, .5f)
             }
             GAMEOVER ->{
-                if(screenState != gameState) getLostScreen()
+                if(updateScreen) getLostScreen()
                 Gdx.gl.glClearColor(1f, 1f, 1f, .5f)
             }
             WINNING ->{
-                if(screenState != gameState) getWonScreen()
+                if(updateScreen) getWonScreen()
                 Gdx.gl.glClearColor(1f, 1f, 1f, .5f)
             }
             RUN ->{
-                if(screenState != gameState) getRunScreen()
+                if(updateScreen) getRunScreen()
             }
         }
         stage.act()
@@ -94,9 +96,9 @@ class GUIHelper(var game: CthulhuGame):GameObject {
         title.setAlignment(Align.center)
         stage.addActor(title)
 
-        if(game.fileExists)
+        if(game.persistence.hasSaveData(CthulhuGame.saveName))
         {
-            // Local Game Button
+            // Continue Game Button
             val locButton = TextButton("Continue Game", mySkin, "default")
             locButton.setSize(col_width, row_height)
             locButton.setPosition((stage.width-col_width)/2, row_height*3)
@@ -116,7 +118,8 @@ class GUIHelper(var game: CthulhuGame):GameObject {
         if(game.blue.canBlue())
         {
             // MultiPlayer Game Button
-            val locButton = TextButton("Multi Game", mySkin, "default")
+            val text = if(!game.multiPlayer.isConnected())  "MultiPlay" else "Disconnect"
+            val locButton = TextButton(text, mySkin, "default")
             locButton.setSize(col_width, row_height)
             locButton.setPosition((stage.width-col_width)/2, row_height*2)
             locButton.label.setAlignment(Align.center)
@@ -124,7 +127,14 @@ class GUIHelper(var game: CthulhuGame):GameObject {
                 override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
                     //game.load(SINGLEGAMENAME)
                     //game.changeGameState(RUN)
-                    game.blue.receiveBtn(2)
+                    if(!game.multiPlayer.isConnected()){
+                        game.blue.receiveBtn(1)
+                        CthulhuGame.gamer = CthulhuGame.ISMONSTER
+                    }
+                    else {
+                        game.blue.stop()
+                        CthulhuGame.gamer = CthulhuGame.ISPLAYER
+                    }
                 }
                 override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                     return true
@@ -132,22 +142,20 @@ class GUIHelper(var game: CthulhuGame):GameObject {
             })
             stage.addActor(locButton)
 
-            // Discover Game Button
-            val discButton = TextButton("Discoverable", mySkin, "default")
-            discButton.setSize(col_width, row_height)
-            discButton.setPosition((stage.width-col_width)/2+col_width, row_height*2)
-            discButton.label.setAlignment(Align.center)
-            discButton.addListener(object : InputListener() {
+            // MultiPlayer Game Button
+            val locButton1 = TextButton("Discover", mySkin, "default")
+            locButton1.setSize(col_width, row_height)
+            locButton1.setPosition((stage.width+col_width)/2, row_height*2)
+            locButton1.label.setAlignment(Align.center)
+            locButton1.addListener(object : InputListener() {
                 override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
-                    //game.load(SINGLEGAMENAME)
-                    //game.changeGameState(RUN)
                     game.blue.receiveBtn(3)
                 }
                 override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                     return true
                 }
             })
-            stage.addActor(discButton)
+            stage.addActor(locButton1)
         }
 
         // Start Button
@@ -314,4 +322,8 @@ class GUIHelper(var game: CthulhuGame):GameObject {
 
     override fun save(data: Persistence.GameData){}
     override fun load(data: Persistence.GameData){}
+    override fun send(mPlayer: MultiPlayer) {}
+    override fun receive(msg: String) {
+        updateScreen = true
+    }
 }

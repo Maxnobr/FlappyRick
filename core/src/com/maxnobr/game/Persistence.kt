@@ -11,7 +11,6 @@ class Persistence {
     private var file = Gdx.files.local(CthulhuGame.FILE)
     var saves = HashMap<String,GameData>()
     var processing = true
-    var hasData = false
 
     init {
         if(file.exists())
@@ -25,7 +24,6 @@ class Persistence {
                     gamesSaved  = lines.pollFirst().toInt()
                 }
                 catch (e : NumberFormatException) { }
-                hasData = gamesSaved > 0
 
                 for(i in 1..gamesSaved){
                     var data:GameData? = null
@@ -37,6 +35,9 @@ class Persistence {
                     catch (e:NumberFormatException) {
                         Gdx.app.log("CRUD","corrupted data: '${data?.saveName}' not loaded")
                     }
+                    catch (e:IllegalStateException){
+                        Gdx.app.log("CRUD","corrupted data: '${data?.saveName}' not loaded")
+                    }
                 }
                 Gdx.app.log("CRUD","finished reading data !")
                 processing = false
@@ -46,6 +47,10 @@ class Persistence {
             processing = false
         }
 
+    }
+
+    fun hasSaveData(saveName: String):Boolean{
+        return saves.containsKey(saveName)
     }
 
     fun save(saveName:String,list:LinkedHashMap<String,GameObject>) {
@@ -68,7 +73,6 @@ class Persistence {
                 it.value.write()
                 file.writeString("\n",true)
             }
-            hasData = saves.size > 0
             processing = false
             Gdx.app.log("CRUD","finished writing data")
             Gdx.app.log("CRUD","data : \n${file.readString()}")
@@ -80,7 +84,6 @@ class Persistence {
         if(saves[saveName] != null) {
             list.forEach { it.value.load(saves[saveName]!!) }
             Gdx.app.log("CRUD","loaded GameData")
-
         }
         else
             Gdx.app.log("CRUD","no data here..")

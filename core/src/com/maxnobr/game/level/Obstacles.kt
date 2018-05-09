@@ -8,12 +8,13 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 import com.codeandweb.physicseditor.PhysicsShapeCache
+import com.maxnobr.game.CthulhuGame
 import com.maxnobr.game.GameObject
+import com.maxnobr.game.MultiPlayer
 import com.maxnobr.game.Persistence
 import java.util.*
 
-class Obstacles : GameObject {
-
+class Obstacles(private var game: CthulhuGame) : GameObject {
     private var atlas: TextureAtlas? = null
     private lateinit var physicsBodies:PhysicsShapeCache
     private lateinit var prefab:ObstaclePrefab
@@ -25,6 +26,8 @@ class Obstacles : GameObject {
     private val topName = "topV2"
     private var gap = 7f
 
+
+    private var updateMsg = ""
     //private var screenHeight = 480f
 
     private var queue:ArrayDeque<Gate> = ArrayDeque()
@@ -44,16 +47,17 @@ class Obstacles : GameObject {
             it.preRender(camera)
         }
 
+        readUpdateMsg()
         if(queue.isEmpty()) {
-            queue.add(Gate(Vector2(camera.viewportWidth+gatePadding,getNewY(camera.viewportHeight)),gap,bottomName,topName,prefab))
+            if(CthulhuGame.gamer == CthulhuGame.ISPLAYER)
+                createGate(Vector2(camera.viewportWidth+gatePadding,getNewY(camera.viewportHeight)),gap,bottomName,topName)
         }
         else{
-            if (queue.peekLast().pos.x < camera.viewportWidth)
-                queue.add(Gate(Vector2(queue.peekLast().pos.x + gatePadding, getNewY(camera.viewportHeight)),gap,bottomName,topName, prefab))
+            if (queue.peekLast().pos.x < camera.viewportWidth && CthulhuGame.gamer == CthulhuGame.ISPLAYER)
+                createGate(Vector2(queue.peekLast().pos.x + gatePadding, getNewY(camera.viewportHeight)),gap,bottomName,topName)
 
             if (queue.peekFirst().pos.x < -20) {
-                queue.peekFirst().dispose()
-                queue.removeFirst()
+                queue.pollFirst().dispose()
             }
         }
     }
@@ -76,6 +80,12 @@ class Obstacles : GameObject {
         physicsBodies.dispose()
     }
 
+    @Synchronized private fun createGate(pos:Vector2, gap:Float, bottomName:String, topName:String){
+            queue.add(Gate(pos, gap, bottomName, topName, prefab))
+        if(CthulhuGame.gamer == CthulhuGame.ISPLAYER)
+            game.multiPlayer.send(MultiPlayer.LEVEL, "${pos.x} ${pos.y} $gap $bottomName $topName")
+    }
+
     override fun save(data: Persistence.GameData){
         data.queue.clear()
         queue.forEach{ it.save(data) }
@@ -83,7 +93,22 @@ class Obstacles : GameObject {
     override fun load(data: Persistence.GameData){
         queue.clear()
         data.queue.forEach {
-            queue.add(Gate(it.pos,it.gap,it.nameBot,it.nameTop,prefab))
+            createGate(it.pos,it.gap,it.nameBot,it.nameTop)
+        }
+    }
+
+    override fun send(mPlayer: MultiPlayer) {}
+    override fun receive(msg: String) {
+        if(CthulhuGame.gamer == CthulhuGame.ISMONSTER){
+            updateMsg = msg
+        }
+    }
+
+    private fun readUpdateMsg(){
+        if(updateMsg.isNotBlank()) {
+            val words = ArrayDeque(updateMsg.split(" ".toRegex()))
+            createGate(Vector2(words.pollFirst().toFloat(), words.pollFirst().toFloat()), words.pollFirst().toFloat(), words.pollFirst(), words.pollFirst())
+            updateMsg = ""
         }
     }
 
@@ -124,7 +149,10 @@ class Obstacles : GameObject {
         override fun save(data: Persistence.GameData){
             data.saveGate(pos,gap,bottomName,topName)
         }
-        override fun load(data: Persistence.GameData){
-        }
+        override fun load(data: Persistence.GameData){}
+
+        override fun send(mPlayer: MultiPlayer) {}
+
+        override fun receive(msg: String) {}
     }
 }

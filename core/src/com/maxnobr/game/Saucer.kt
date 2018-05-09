@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.World
 import com.codeandweb.physicseditor.PhysicsShapeCache
 import com.maxnobr.game.level.LevelBorders
+import java.util.*
 
 class Saucer(private val game: CthulhuGame) : GameObject {
 
@@ -42,6 +43,7 @@ class Saucer(private val game: CthulhuGame) : GameObject {
 
     // Elapsed time
     private var elapsed_time = 0f
+    private var update_timer = 0f
 
     private var scaleX = .2f
     private var scaleY = .2f
@@ -54,8 +56,17 @@ class Saucer(private val game: CthulhuGame) : GameObject {
     private val jump = 60f
     private var isInvinsible = false
 
-    fun takeDamage(dam:Int){
-        if(!isInvinsible) {
+    companion object {
+        const val CODE_JUMP = 0
+        const val CODE_HURT = 1
+        const val CODE_STOPINVINS = 2
+        const val CODE_UPDATE = 3
+    }
+
+    fun takeDamage(dam:Int,override:Boolean){
+        if(override || (!isInvinsible && CthulhuGame.gamer == CthulhuGame.ISPLAYER)) {
+            Gdx.input.vibrate(100)
+            //Gdx.input.vibrate(longArrayOf(10,50,10,50),1)
             isInvinsible = true
             health -= dam
             elapsed_time = 0f
@@ -63,8 +74,7 @@ class Saucer(private val game: CthulhuGame) : GameObject {
             interVec = body.position
             invisibilityBlink = invisibilityBlinkMax
             blinkTimer = 0f
-            //invinsSdID = invinsSd.play(1.0f)
-            //invinsSd.setLooping(invinsSdID,true)
+            game.multiPlayer.send(MultiPlayer.SAUCER, CODE_HURT)
         }
     }
 
@@ -79,6 +89,7 @@ class Saucer(private val game: CthulhuGame) : GameObject {
         if(!isInvinsible) {
             body.linearVelocity = Vector2(0f, jump)
             blastSd.play(.3f)
+            game.multiPlayer.send(MultiPlayer.SAUCER, CODE_JUMP)
         }
     }
 
@@ -133,7 +144,7 @@ class Saucer(private val game: CthulhuGame) : GameObject {
     override fun preRender(camera:Camera) {
         //if(CthulhuGame.gameState == CthulhuGame.RUN) body.linearVelocity = Vector2(body.linearVelocity.x,body.linearVelocity.y - 1)
 
-        if((CthulhuGame.gameState == CthulhuGame.RUN) and isInvinsible) {
+        if((CthulhuGame.gameState == CthulhuGame.RUN) && isInvinsible) {
             if(!invinsSd.isPlaying) invinsSd.play()
             body.setTransform(interVec.interpolate(
                     Vector2((camera.viewportWidth - sprite.width * scaleX) / 2,
@@ -151,7 +162,7 @@ class Saucer(private val game: CthulhuGame) : GameObject {
                 sprite.setColor(sprite.color.r,sprite.color.g,sprite.color.b,a)
             }
 
-            if(elapsed_time > invisibilityLength) {
+            if(isInvinsible && elapsed_time > invisibilityLength) {
                 stopInvinc()
             }
         }
@@ -168,6 +179,8 @@ class Saucer(private val game: CthulhuGame) : GameObject {
         body.isActive = true
         body.linearVelocity = Vector2()
         invinsSd.stop()
+        if(CthulhuGame.gamer == CthulhuGame.ISPLAYER)
+            game.multiPlayer.send(MultiPlayer.SAUCER,CODE_STOPINVINS)
     }
 
     override fun render(batch: SpriteBatch,camera:Camera) {
@@ -235,5 +248,31 @@ class Saucer(private val game: CthulhuGame) : GameObject {
         body.linearVelocity = data.playerBodyVelocity
 
         isInvinsible = data.playerIsInvinsible
+    }
+    override fun send(mPlayer: MultiPlayer) {
+        //Gdx.app.log("NOW","outside")
+        if (CthulhuGame.gamer == CthulhuGame.ISPLAYER)
+            //Gdx.app.log("NOW","only player")
+        if (elapsed_time > update_timer) {
+                update_timer = elapsed_time + 0.2f
+                //Gdx.app.log("NOW", "its timed !")
+                val msg = "$CODE_UPDATE ${body.position.x} ${body.position.y} ${body.linearVelocity.x} ${body.linearVelocity.y}"
+                mPlayer.send(MultiPlayer.SAUCER, msg)
+            }
+    }
+    override fun receive(msg: String) {
+        if(CthulhuGame.gamer == CthulhuGame.ISMONSTER){
+            val words = ArrayDeque(msg.split(" ".toRegex()))
+            when(words.pollFirst().toInt()){
+                CODE_JUMP -> jump()
+                CODE_HURT -> takeDamage(1,true)
+                CODE_STOPINVINS -> stopInvinc()
+                CODE_UPDATE ->{
+                    //Gdx.app.log("NOW","player received!")
+                    body.setTransform(words.pollFirst().toFloat(), words.pollFirst().toFloat(), 0f)
+                    body.linearVelocity = Vector2(words.pollFirst().toFloat(), words.pollFirst().toFloat())
+                }
+            }
+        }
     }
 }

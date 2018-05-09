@@ -12,4 +12,6 @@ interface GameObject {
     fun dispose()
     fun save(data: Persistence.GameData)
     fun load(data: Persistence.GameData)
+    fun send(mPlayer: MultiPlayer)
+    fun receive(msg: String)
 }

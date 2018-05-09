@@ -17,12 +17,13 @@ class AndroidBluetooth(private var activity:Activity) : Bluetooth{
     private var player:MultiPlayer? = null
 
     private var mConnectedDeviceName: String? = null
-    private var mOutStringBuffer: StringBuffer? = null
     private var mBluetoothAdapter: BluetoothAdapter? = null
     private var mChatService: BluetoothChatService? = null
 
+
+
     override fun logBlue(msg: String) {
-        Gdx.app.log("androidTag",msg)
+        //Gdx.app.log("androidTag",msg)
     }
 
     override fun setMulti(multi:MultiPlayer) {
@@ -37,8 +38,10 @@ class AndroidBluetooth(private var activity:Activity) : Bluetooth{
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         if (mBluetoothAdapter == null)
             logBlue("there is no BluetoothAdapter")
-        else
+        else{
             logBlue("BluetoothAdapter Found !")
+            MultiPlayer.myName = mBluetoothAdapter!!.name
+        }
     }
 
     fun onStart() {
@@ -58,17 +61,14 @@ class AndroidBluetooth(private var activity:Activity) : Bluetooth{
     }
 
     fun onResume() {
-        if (mChatService != null) {
-            if (mChatService!!.state == BluetoothChatService.STATE_NONE) {
-                mChatService?.start()
-            }
+        if (mChatService != null && mChatService!!.state == BluetoothChatService.STATE_NONE) {
+            mChatService?.start()
         }
     }
 
     private fun setupChat() {
         logBlue("setupChat()")
         mChatService = BluetoothChatService(mHandler)
-        mOutStringBuffer = StringBuffer("")
     }
 
     private fun ensureDiscoverable() {
@@ -76,7 +76,7 @@ class AndroidBluetooth(private var activity:Activity) : Bluetooth{
         if (mBluetoothAdapter?.scanMode != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
             val discoverableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE)
             discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, REQUEST_DURATION)
-            activity.startActivityForResult(discoverableIntent,REQUEST_ENABLE_BT)
+            activity.startActivity(discoverableIntent)
         }
     }
 
@@ -85,7 +85,6 @@ class AndroidBluetooth(private var activity:Activity) : Bluetooth{
             if (message.isNotEmpty()) {
                 val send = message.toByteArray()
                 mChatService?.write(send)
-                mOutStringBuffer?.setLength(0)
             }
         }
         else
@@ -112,6 +111,7 @@ class AndroidBluetooth(private var activity:Activity) : Bluetooth{
                     else -> "unknown status"
                 }
                 logBlue("changing status to: $status")
+                player?.changeStatus(it.arg1)
             }
             Constants.MESSAGE_WRITE -> {
                 val writeBuf = it.obj as ByteArray
@@ -121,13 +121,16 @@ class AndroidBluetooth(private var activity:Activity) : Bluetooth{
             }
             Constants.MESSAGE_READ -> {
                 val readBuf = it.obj as ByteArray
+                //val readMessage = String(readBuf, 0, it.arg1)
                 val readMessage = String(readBuf, 0, it.arg1)
+
                 logBlue("just read: $readMessage")
-                player?.receive(readMessage)
+                player!!.receive(readMessage)
             }
             Constants.MESSAGE_DEVICE_NAME -> {
                 mConnectedDeviceName = it.data.getString(Constants.DEVICE_NAME)
                 logBlue("Connected to $mConnectedDeviceName")
+                player?.handshake(mConnectedDeviceName!!)
             }
             Constants.MESSAGE_TOAST -> {
                 logBlue(it.data.getString(Constants.TOAST))
@@ -150,7 +153,7 @@ class AndroidBluetooth(private var activity:Activity) : Bluetooth{
                     connectDevice(data, false)
                 }
             REQUEST_ENABLE_BT ->
-                if (resultCode == REQUEST_DURATION) {
+                if (resultCode == Activity.RESULT_OK) {
                     setupChat()
                 } else {
                     // User did not enable Bluetooth or an error occurred
@@ -173,5 +176,9 @@ class AndroidBluetooth(private var activity:Activity) : Bluetooth{
             }
             3 -> ensureDiscoverable()
         }
+    }
+
+    override fun stop() {
+        mChatService?.stop()
     }
 }

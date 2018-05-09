@@ -56,7 +56,6 @@ class LevelBorders(val game:CthulhuGame, val world: World,camera: Camera){
         cthulhuBody.userData = "death"
         cthulhuBox.dispose()
 
-
         //ceiling
         val ceilingBodyDef = BodyDef()
         ceilingBodyDef.position.set(Vector2(camera.viewportWidth/2, camera.viewportHeight))
