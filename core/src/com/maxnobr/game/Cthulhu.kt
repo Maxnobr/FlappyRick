@@ -8,17 +8,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.BodyDef
-import com.badlogic.gdx.physics.box2d.FixtureDef
-import com.badlogic.gdx.physics.box2d.PolygonShape
-import com.badlogic.gdx.physics.box2d.World
+import com.badlogic.gdx.physics.box2d.*
 import com.maxnobr.game.level.LevelBorders
 import java.util.*
 
 class Cthulhu(private var game: CthulhuGame) :GameObject{
 
-    private val FRAME_DURATION = .19f//.19f
-    private val PUNCH_DURATION = .4f
+    private val FRAME_DURATION = .19f
+    private val PUNCH_DURATION = .6f
     private lateinit var atlas: TextureAtlas
 
     private lateinit var bodySprite: Sprite
@@ -27,6 +24,8 @@ class Cthulhu(private var game: CthulhuGame) :GameObject{
     private lateinit var punchSprite: Sprite
 
     private var target = Vector2()
+    private var originalTarget = Vector2()
+    private var armLength = 17f
 
     private var isPunching = false
 
@@ -39,6 +38,8 @@ class Cthulhu(private var game: CthulhuGame) :GameObject{
     private lateinit var wingAnimation: Animation<TextureAtlas.AtlasRegion>
     private lateinit var armAnimation: Animation<TextureAtlas.AtlasRegion>
     private lateinit var punchAnimation: Animation<TextureAtlas.AtlasRegion>
+
+    private lateinit var punchBody:Body
 
     private var elapsed_time = 0f
     private var punch_time = 100f
@@ -63,42 +64,35 @@ class Cthulhu(private var game: CthulhuGame) :GameObject{
         bodySprite = Sprite(bodyFrames?.first())
         bodySprite.setOrigin(0f,0f)
         bodySprite.setScale(scaleX,scaleY)
-        bodySprite.setPosition(-40f,0f)
+        bodySprite.setPosition(-50f,0f)
 
 
         wingSprite = Sprite(wingFrames?.first())
         wingSprite.setOrigin(0f,0f)
         wingSprite.setScale(scaleX,scaleY)
-        //wingSprite.setPosition(bodySprite.x+wingOffset.x*scaleX,bodySprite.y+wingOffset.y*scaleY)
 
         armSprite = Sprite(armFrames?.first())
-        //armSprite.setOrigin(0f,0f)
         armSprite.setOrigin(0f,0f)
         armSprite.setScale(scaleX,scaleY)
-        //armSprite.setPosition(bodySprite.x+armOffset.x*scaleX,bodySprite.y+armOffset.y*scaleY)
-        //armSprite.setCenter(camera.viewportWidth/2f,camera.viewportHeight/2)
-        //armSprite.setPosition(bodySprite.x+armOffset.x*scaleX,bodySprite.y+armOffset.y*scaleY)
 
         punchSprite = Sprite(punchFrames?.first())
         punchSprite.setScale(scaleX,scaleY)
         punchSprite.setOrigin(22f,43f)
 
         //physics body
-        val punchBodyDef = BodyDef()
-        punchBodyDef.position.set(Vector2(target.x, target.y))
-        val punchBody = world.createBody(punchBodyDef)
+        punchBody = world.createBody(BodyDef())
 
-        val punchBox = PolygonShape()
-        punchBox.setAsBox(camera.viewportWidth, 1f)
+        val punchCircle = CircleShape()
+        punchCircle.radius = 5f
 
-        val ceilingFixDef = FixtureDef()
-        ceilingFixDef.shape = punchBox
-        ceilingFixDef.filter.categoryBits = LevelBorders.CATEGORY_TRIGGERS
-        ceilingFixDef.filter.maskBits = LevelBorders.MASK_TRIGGERS
+        val punchFixDef = FixtureDef()
+        punchFixDef.shape = punchCircle
+        punchFixDef.filter.categoryBits = LevelBorders.CATEGORY_TRIGGERS
+        punchFixDef.filter.maskBits = LevelBorders.MASK_TRIGGERS
 
-        punchBody.createFixture(ceilingFixDef)
+        punchBody.createFixture(punchFixDef)
         punchBody.userData = "death"
-        punchBox.dispose()
+        punchCircle.dispose()
         punchBody.isActive = false
     }
 
@@ -109,11 +103,13 @@ class Cthulhu(private var game: CthulhuGame) :GameObject{
             if(isPunching)
                 if (punchAnimation.isAnimationFinished(punch_time))
                     isPunching = false
-                else
+                else {
                     aimPunch()
+                    punchBody.setTransform(target, 0f)
+                    punchBody.isActive = punchAnimation.getKeyFrameIndex(punch_time) == 2
+                }
         }
 
-        //elapsed_time = 0f
         bodySprite.setRegion(bodyAnimation.getKeyFrame(elapsed_time))
 
 
@@ -128,29 +124,16 @@ class Cthulhu(private var game: CthulhuGame) :GameObject{
             7->Vector2(28f,33f)
             else -> Vector2()
         }
-        //armSprite.setOrigin(vec.x,vec.y)
-        //armSprite.setOrigin(0f,0f)
         armSprite.setPosition(bodySprite.x+armOffset.x*scaleX,bodySprite.y+armOffset.y*scaleY)
         armpos.set(armSprite.x+vec.x,armSprite.y+vec.y)
         armSprite.setRegion(armAnimation.getKeyFrame(elapsed_time))
-        //armSprite.setPosition(bodySprite.x+(armOffset.x-vec.x)*scaleX,bodySprite.y+(armOffset.y-vec.y)*scaleY)
 
-        //punchSprite.setOrigin(23f,43f)
-        //punchSprite.setOrigin(0f,0f)
         punchSprite.setRegion(punchAnimation.getKeyFrame(punch_time))
-        //punchSprite.setRegion(punchAnimation.keyFrames[2])
-        //punchSprite.setOrigin(vec.x,vec.y)
-        //punchSprite.setPosition(bodySprite.x+(armOffset.x-vec.x)*scaleX,bodySprite.y+(armOffset.y-vec.y)*scaleY)
         punchSprite.x = bodySprite.x+armOffset.x*scaleX-(1-scaleX)*punchSprite.originX+(vec.x-punchSprite.originX)
         punchSprite.y = bodySprite.y+armOffset.y*scaleY-(1-scaleY)*punchSprite.originY+(vec.y-punchSprite.originY)
-        //punchSprite.setPosition(bodySprite.x+(armOffset.x-23f)*scaleX,bodySprite.y+(armOffset.y-44f)*scaleY)
 
         wingSprite.setRegion(wingAnimation.getKeyFrame(elapsed_time))
         wingSprite.setPosition(bodySprite.x+wingOffset.x*scaleX,bodySprite.y+wingOffset.y*scaleY)
-
-        //Gdx.app.log("PUNCH", "armpos is : ${armpos.x} , ${armpos.y}")
-
-        //bodySprite.x -= 0.02f
     }
 
     override fun render(batch: SpriteBatch, camera: Camera) {
@@ -164,18 +147,10 @@ class Cthulhu(private var game: CthulhuGame) :GameObject{
     }
 
     @Synchronized fun punch(pos:Vector2){
-        //val x = pos.angle(Vector2(0f,-1f))
-        target = pos
-        val angle = Vector2(pos.x - armpos.x, pos.y - armpos.y).angle()
+        originalTarget = Vector2(pos).sub(armpos).clamp(armLength*1.2f, Float.POSITIVE_INFINITY).add(armpos)
+        val angle = Vector2(pos).sub(armpos).angle()
         if(!isPunching && ( angle < 100 || angle > 260)) {
             isPunching = true
-
-            //Gdx.app.log("PUNCH", "\norigin   x: ${punchSprite.originX} y: ${punchSprite.originY}")
-            //Gdx.app.log("PUNCH", "position x: ${punchSprite.x} y: ${punchSprite.y}")
-
-            //Gdx.app.log("PUNCH", "angle is $x")
-            //Gdx.app.log("PUNCH", "pos is : ${pos.x} , ${pos.y}")
-            //Gdx.app.log("PUNCH", "armpos is : ${armpos.x} , ${armpos.y}")
             aimPunch()
             punch_time = 0f
         }
@@ -184,8 +159,9 @@ class Cthulhu(private var game: CthulhuGame) :GameObject{
     }
 
     private fun aimPunch() {
-        punchSprite.rotation = Vector2(target.x - armpos.x, target.y - armpos.y).angle()
-        val angle = Vector2(target.x - armpos.x, target.y - armpos.y).angle()
+        target = Vector2(originalTarget).sub(armpos).setLength(armLength).add(armpos)
+        val angle = Vector2(originalTarget).sub(armpos).angle()
+        punchSprite.rotation = angle
         val inter = Interpolation.smooth.apply(punchSprite.rotation+360f,angle+360f,Math.min(punch_time/(PUNCH_DURATION*4),1f))-360f
         punchSprite.rotation = inter%360
     }

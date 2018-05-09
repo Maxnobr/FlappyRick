@@ -31,12 +31,8 @@ class GUIHelper(var game: CthulhuGame):GameObject {
     private var screenState = -1
     private var updateScreen = false
 
-    //private var scaleX = 1f
-    //private var scaleY = 1f
 
     override fun create(batch: SpriteBatch,camera: Camera,world: World) {
-        //stage = Stage(ExtendViewport(camera.viewportWidth,camera.viewportHeight,camera),batch)
-        //stage = Stage(ExtendViewport(Gdx.graphics.width.toFloat(),Gdx.graphics.height.toFloat(),camera),batch)
         stage = Stage(ScreenViewport())
         Gdx.input.inputProcessor = stage
 
@@ -82,7 +78,7 @@ class GUIHelper(var game: CthulhuGame):GameObject {
         Gdx.input.inputProcessor = stage
         val Help_Guides = 6
         val row_height = stage.height / Help_Guides
-        val col_width = stage.width / Help_Guides
+        val col_width = stage.width / Help_Guides * 2f
 
         val image = Image(splashScreen)
         image.setSize(stage.width,stage.height)
@@ -118,9 +114,9 @@ class GUIHelper(var game: CthulhuGame):GameObject {
         if(game.blue.canBlue())
         {
             // MultiPlayer Game Button
-            val text = if(!game.multiPlayer.isConnected())  "MultiPlay" else "Disconnect"
+            val text = if(!game.multiPlayer.isConnected())  "Join" else "Disconnect"
             val locButton = TextButton(text, mySkin, "default")
-            locButton.setSize(col_width, row_height)
+            locButton.setSize(col_width / if(!game.multiPlayer.isConnected()) 2 else 1, row_height)
             locButton.setPosition((stage.width-col_width)/2, row_height*2)
             locButton.label.setAlignment(Align.center)
             locButton.addListener(object : InputListener() {
@@ -142,20 +138,23 @@ class GUIHelper(var game: CthulhuGame):GameObject {
             })
             stage.addActor(locButton)
 
-            // MultiPlayer Game Button
-            val locButton1 = TextButton("Discover", mySkin, "default")
-            locButton1.setSize(col_width, row_height)
-            locButton1.setPosition((stage.width+col_width)/2, row_height*2)
-            locButton1.label.setAlignment(Align.center)
-            locButton1.addListener(object : InputListener() {
-                override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
-                    game.blue.receiveBtn(3)
-                }
-                override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                    return true
-                }
-            })
-            stage.addActor(locButton1)
+            // Discover Game Button
+            if(!game.multiPlayer.isConnected()) {
+                val locButton1 = TextButton("Discover", mySkin, "default")
+                locButton1.setSize(col_width/2, row_height)
+                locButton1.setPosition(stage.width / 2, row_height * 2)
+                locButton1.label.setAlignment(Align.center)
+                locButton1.addListener(object : InputListener() {
+                    override fun touchUp(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int) {
+                        game.blue.receiveBtn(3)
+                    }
+
+                    override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                        return true
+                    }
+                })
+                stage.addActor(locButton1)
+            }
         }
 
         // Start Button

@@ -3,9 +3,7 @@ package com.maxnobr.game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
-import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.*
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode
 import com.badlogic.gdx.math.Interpolation
@@ -63,7 +61,7 @@ class Saucer(private val game: CthulhuGame) : GameObject {
         const val CODE_UPDATE = 3
     }
 
-    fun takeDamage(dam:Int,override:Boolean){
+    @Synchronized fun takeDamage(dam:Int,override:Boolean){
         if(override || (!isInvinsible && CthulhuGame.gamer == CthulhuGame.ISPLAYER)) {
             Gdx.input.vibrate(100)
             //Gdx.input.vibrate(longArrayOf(10,50,10,50),1)
@@ -85,7 +83,7 @@ class Saucer(private val game: CthulhuGame) : GameObject {
         stopInvinc()
     }
 
-    fun jump() {
+    @Synchronized fun jump() {
         if(!isInvinsible) {
             body.linearVelocity = Vector2(0f, jump)
             blastSd.play(.3f)
@@ -196,10 +194,7 @@ class Saucer(private val game: CthulhuGame) : GameObject {
             1 -> dam3Animation?.getKeyFrame(elapsed_time)!!
             else -> crashAnimation?.getKeyFrame(elapsed_time)!!
         }
-        //currentFrame = flyingAnimation?.getKeyFrame(elapsed_time)!!
 
-        // Drawing the frame
-        //Gdx.app.log("tag","originX :$originX, originY :$originY")
         sprite.setRegion(currentFrame)
         sprite.draw(batch)
 
@@ -209,7 +204,6 @@ class Saucer(private val game: CthulhuGame) : GameObject {
 
         if(invinsSd.isPlaying && CthulhuGame.gameState != CthulhuGame.RUN)
             invinsSd.stop()
-        //batch.draw(currentFrame, originX, originY, width, height)
     }
 
     override fun dispose() {
@@ -250,12 +244,9 @@ class Saucer(private val game: CthulhuGame) : GameObject {
         isInvinsible = data.playerIsInvinsible
     }
     override fun send(mPlayer: MultiPlayer) {
-        //Gdx.app.log("NOW","outside")
         if (CthulhuGame.gamer == CthulhuGame.ISPLAYER)
-            //Gdx.app.log("NOW","only player")
         if (elapsed_time > update_timer) {
                 update_timer = elapsed_time + 0.2f
-                //Gdx.app.log("NOW", "its timed !")
                 val msg = "$CODE_UPDATE ${body.position.x} ${body.position.y} ${body.linearVelocity.x} ${body.linearVelocity.y}"
                 mPlayer.send(MultiPlayer.SAUCER, msg)
             }
@@ -268,7 +259,6 @@ class Saucer(private val game: CthulhuGame) : GameObject {
                 CODE_HURT -> takeDamage(1,true)
                 CODE_STOPINVINS -> stopInvinc()
                 CODE_UPDATE ->{
-                    //Gdx.app.log("NOW","player received!")
                     body.setTransform(words.pollFirst().toFloat(), words.pollFirst().toFloat(), 0f)
                     body.linearVelocity = Vector2(words.pollFirst().toFloat(), words.pollFirst().toFloat())
                 }

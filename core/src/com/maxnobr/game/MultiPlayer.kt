@@ -37,9 +37,8 @@ class MultiPlayer(var game:CthulhuGame, private var bluetooth: Bluetooth){
         if(CthulhuGame.gameState == CthulhuGame.START) {
             CthulhuGame.saveName = connectedName!!
             game.receive(CthulhuGame.GUI,"")
-            //game.changeGameState(CthulhuGame.RUN)
         }
-        Gdx.app.log(TAG,"HANDSHAKE got name = '$connectedName")
+        Gdx.app.log(TAG,"HANDSHAKE got name = '$connectedName'")
     }
 
     fun changeStatus(status:Int){
@@ -61,7 +60,6 @@ class MultiPlayer(var game:CthulhuGame, private var bluetooth: Bluetooth){
     }
 
     fun receive(msg:String){
-        //Gdx.app.log(TAG,"received: $msg")
         try {
             val lines = ArrayDeque(msg.split("\n".toRegex()))
             when (lines.pollFirst().toInt()) {

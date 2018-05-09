@@ -13,7 +13,6 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.maxnobr.game.level.LevelBorders
 import com.maxnobr.game.level.Obstacles
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match
 import java.util.*
 
 class CthulhuGame(var blue:Bluetooth) : ApplicationAdapter() {
@@ -120,7 +119,6 @@ class CthulhuGame(var blue:Bluetooth) : ApplicationAdapter() {
             stepWorld()
             if((Math.abs(Gdx.input.accelerometerX)+Math.abs(Gdx.input.accelerometerY)+Math.abs(Gdx.input.accelerometerZ)) > 60)
                 changeGameState(PAUSE)
-            //Gdx.app.log("NOW","${Math.abs(Gdx.input.accelerometerX)+Math.abs(Gdx.input.accelerometerY)+Math.abs(Gdx.input.accelerometerZ)}")
             if(Gdx.input.isTouched){
                 if(readyToTap) {
                     readyToTap = false
@@ -137,15 +135,15 @@ class CthulhuGame(var blue:Bluetooth) : ApplicationAdapter() {
                 readyToTap = true
         }
         if(debug) {
-            Gdx.gl.glClearColor(0f,0f,0f,1f)
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+            Gdx.gl.glClearColor(0f,0f,0f,.3f)
+            //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
             debugRenderer.render(world, camera.combined)
         }
 
         list[GUI]?.render(batch,camera)
     }
 
-    fun changeGameState(state:Int) {
+    @Synchronized fun changeGameState(state:Int) {
 
         while(persistence.processing)
             Thread.sleep(100)
@@ -164,7 +162,6 @@ class CthulhuGame(var blue:Bluetooth) : ApplicationAdapter() {
                 introMsc.stop()
             }
             PAUSE -> {
-                //Gdx.input.vibrate(longArrayOf(10,50,10,50),-1)
                 save(saveName)
             }
             WINNING, GAMEOVER -> {
@@ -179,10 +176,6 @@ class CthulhuGame(var blue:Bluetooth) : ApplicationAdapter() {
             changeGameState(PAUSE)
             save(saveName)
         }
-    }
-
-    override fun resume() {
-        super.resume()
     }
 
     private fun reset() {
