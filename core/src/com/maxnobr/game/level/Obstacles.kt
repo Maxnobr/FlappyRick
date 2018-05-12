@@ -1,18 +1,19 @@
 package com.maxnobr.game.level
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.*
+import com.badlogic.gdx.physics.box2d.Body
+import com.badlogic.gdx.physics.box2d.World
 import com.codeandweb.physicseditor.PhysicsShapeCache
 import com.maxnobr.game.CthulhuGame
 import com.maxnobr.game.GameObject
 import com.maxnobr.game.MultiPlayer
 import com.maxnobr.game.Persistence
 import java.util.*
+import java.util.concurrent.ConcurrentLinkedDeque
 
 class Obstacles(private var game: CthulhuGame) : GameObject {
     private var atlas: TextureAtlas? = null
@@ -27,10 +28,11 @@ class Obstacles(private var game: CthulhuGame) : GameObject {
     private var gap = 7f
 
 
-    private var updateMsg = ""
+    //private var updateMsg = ""
     //private var screenHeight = 480f
 
-    private var queue:ArrayDeque<Gate> = ArrayDeque()
+    //private var queue:ArrayDeque<Gate> = ArrayDeque()
+    private var queue:ConcurrentLinkedDeque<Gate> = ConcurrentLinkedDeque()
 
     override fun create(batch: SpriteBatch, camera: Camera, world: World) {
         atlas = TextureAtlas(Gdx.files.internal("Obstacles.atlas"))
@@ -47,7 +49,7 @@ class Obstacles(private var game: CthulhuGame) : GameObject {
             it.preRender(camera)
         }
 
-        readUpdateMsg()
+        //readUpdateMsg()
         if(queue.isEmpty()) {
             if(CthulhuGame.gamer == CthulhuGame.ISPLAYER)
                 createGate(Vector2(camera.viewportWidth+gatePadding,getNewY(camera.viewportHeight)),gap,bottomName,topName)
@@ -100,17 +102,19 @@ class Obstacles(private var game: CthulhuGame) : GameObject {
     override fun send(mPlayer: MultiPlayer) {}
     override fun receive(msg: String) {
         if(CthulhuGame.gamer == CthulhuGame.ISMONSTER){
-            updateMsg = msg
+            val words = ArrayDeque(msg.split(" ".toRegex()))
+            createGate(Vector2(words.pollFirst().toFloat(), words.pollFirst().toFloat()), words.pollFirst().toFloat(), words.pollFirst(), words.pollFirst())
+            //updateMsg = msg
         }
     }
 
-    private fun readUpdateMsg(){
+    /*private fun readUpdateMsg(){
         if(updateMsg.isNotBlank()) {
             val words = ArrayDeque(updateMsg.split(" ".toRegex()))
             createGate(Vector2(words.pollFirst().toFloat(), words.pollFirst().toFloat()), words.pollFirst().toFloat(), words.pollFirst(), words.pollFirst())
             updateMsg = ""
         }
-    }
+    }*/
 
     class Gate(var pos:Vector2,private var gap:Float, private val bottomName:String, private val topName:String, private val prefab: ObstaclePrefab): GameObject {
 
