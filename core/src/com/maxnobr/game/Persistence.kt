@@ -31,12 +31,10 @@ class Persistence {
                         data = GameData(lines.pollFirst())
                         data.read(lines)
                         saves[data.saveName] = data
+                        lines.pollFirst()
                     }
-                    catch (e:NumberFormatException) {
-                        Gdx.app.log("CRUD","corrupted data: '${data?.saveName}' not loaded")
-                    }
-                    catch (e:IllegalStateException){
-                        Gdx.app.log("CRUD","corrupted data: '${data?.saveName}' not loaded")
+                    catch (e:Exception) {
+                        Gdx.app.log("CRUD","corrupted data: '${data?.saveName}' not loaded\n ${e.printStackTrace()}")
                     }
                 }
                 Gdx.app.log("CRUD","finished reading data !")

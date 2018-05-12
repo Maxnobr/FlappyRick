@@ -68,6 +68,7 @@ class Saucer(private val game: CthulhuGame) : GameObject {
             isInvinsible = true
             health -= dam
             elapsed_time = 0f
+            update_timer = elapsed_time
             body.isActive = false
             interVec = body.position
             invisibilityBlink = invisibilityBlinkMax
@@ -237,6 +238,7 @@ class Saucer(private val game: CthulhuGame) : GameObject {
         blinkTimer = data.playerBlinkTimer
         isBlinking = data.playerIsBlinking
         elapsed_time = data.playerElapsed_time
+        update_timer = elapsed_time
 
         body.isActive = data.playerBodyIsActive
         body.linearVelocity = data.playerBodyVelocity

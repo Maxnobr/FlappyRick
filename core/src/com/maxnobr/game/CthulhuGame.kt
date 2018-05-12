@@ -65,8 +65,6 @@ class CthulhuGame(var blue:Bluetooth) : ApplicationAdapter() {
         const val CODE_CHANGESTATE = 0
 
         private var fromMulti = false
-        var flipper = true
-        var flipper2 = true
     }
 
     override fun create() {
